@@ -1,14 +1,4 @@
 function init() {
-    // Load the data in
-    // d3.csv("./data/HEALTH_REAC_04052024140125591.csv").then(function(data) {
-    //     
-
-    //     // Work in progress
-    //     for(var i = 0; i < data.length; i++) {
-
-    //     }
-    // });
-
     d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
         return {
             VAR: d.VAR,             // Data code (total female, total male, etc.)
