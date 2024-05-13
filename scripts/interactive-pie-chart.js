@@ -1,3 +1,6 @@
+const w = 1000;
+const h = 500;
+
 function init() {
     //reading the data
     d3.csv("./data/HEALTH_REAC_04052024140125591.csv", function(d) {
@@ -40,6 +43,29 @@ function init() {
         // Console log for checking the data
         console.table(filtered_counts);
         console.log(oldest_year + " to " + latest_year);
+
+        var svg = d3.select("#vis2")
+                    .append("svg")
+                    .attr("width", w)
+                    .attr("height", h);
+
+        const slider_input = document.querySelector("#slider_year");
+        var current_year = slider_input.value;
+
+        // Debugging
+        console.log ("Currently the slider is at " + current_year);
+
+        slider_input.addEventListener("input", (event) => {
+            current_year = event.target.value;
+            console.log ("Now it's at " + current_year);
+        })
+
+        // Event listener for changes of the slider in HTML
+        
     });
+}
+
+function Pie_Chart(dataset, svg_width, svg_height, year) {
+
 }
 window.onload = init;

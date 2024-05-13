@@ -1,0 +1,16 @@
+datalist {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 500px;
+
+}
+  
+/* option {
+    padding: 0;
+} */
+  
+input[type="range"] {
+    width: 500px;
+    margin: 0;
+}
