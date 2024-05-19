@@ -1,15 +1,14 @@
 const w = 1000;
 const h = 500;
+var organized_data = {};
 
 function init() {
-    //reading the data
+    // Reading the data
     d3.csv("./data/HEALTH_REAC_04052024140125591.csv", function(d) {
         return {
-            VAR: d.VAR,             // Data code (total female, total male, etc.)
-            COU: d.COU,             // Country code
+            Variable: d.VAR,        // Data code (total female, total male, etc.)
             Country: d.Country,     // Country
-            Variable: d.Variable,   // Full Description of data
-            UNIT: d.UNIT,           // Unit code (% or head counts)
+            Unit: d.UNIT,           // Unit code (% or head counts)
             Year: d.Year,           // Year
             Value: d.Value          // Estimated value
         };
@@ -19,30 +18,32 @@ function init() {
             //      - From Australia;
             //      - Total female and male;
             //      - Both head counts and % of head counts;
-            return (d.COU == "AUS" && (d.VAR == "PAGGFEMM" || d.VAR == "PAGGHOMM"))
-        });
-        // console.table(filtered);
-
-        // filtered_counts: Male physicians and female physicians of Australia (in number)
-        // filtered_percentage: Male physicians and female physicians of Australia (in percentage)
-        var filtered_counts = filtered.filter(function(d) {
-            return d.UNIT == "PERSMYNB";
-        });
-        var filtered_percentage = filtered.filter(function(d) {
-            return d.UNIT == "PHYTOTNB";
+            return (d.Country == "Australia" && 
+                    (d.Variable == "PAGGFEMM" || d.Variable == "PAGGHOMM"));
         });
 
-        // oldest_year and latest_year are for the time slider
-        var oldest_year = d3.min(filtered_counts, function(d){
-            return d.Year;
+        var filtered_counts = filtered.filter(function(d) {     // Male physicians and female physicians of Australia (in number)
+            return d.Unit == "PERSMYNB";
         });
-        var latest_year = d3.max(filtered_counts, function(d) {
-            return d.Year;
-        });
+            filtered_counts.forEach(function(d) {                   // Example: If you need data from 2020, only female, in Australia 
+            var Gender;                                         // -> organized_data[2020]["Australia"]["Female"]
+            if (d.Variable == "PAGGFEMM") { Gender = "Female";}
+            else { Gender = "Male";}
 
-        // Console log for checking the data
-        console.table(filtered_counts);
-        console.log(oldest_year + " to " + latest_year);
+            if (!organized_data[d.Year]) {
+                organized_data[d.Year] = {};                    // Create new object if it doesn't exist
+            }
+            if (!organized_data[d.Year][d.Country]) {
+                organized_data[d.Year][d.Country] = [];         // Create new object if it doesn't exist
+            }
+
+            organized_data[d.Year][d.Country].push({
+                gender: Gender,
+                value: d.Value
+            })
+        })
+
+        console.log(organized_data[2021]["Australia"]);
 
         var svg = d3.select("#vis2")
                     .append("svg")
@@ -52,20 +53,22 @@ function init() {
         const slider_input = document.querySelector("#slider_year");
         var current_year = slider_input.value;
 
-        // Debugging
-        console.log ("Currently the slider is at " + current_year);
+        // Pie_Chart(filtered_counts, w, h, current_year);
 
-        slider_input.addEventListener("input", (event) => {
-            current_year = event.target.value;
-            console.log ("Now it's at " + current_year);
-        })
-
-        // Event listener for changes of the slider in HTML
+        console.log ("Currently the slider is at " + current_year); // Debugging
         
+        slider_input.addEventListener("input", (event) => {         // Event listener for changes of the slider in HTML
+            current_year = event.target.value;
+            console.log ("Now it's at " + current_year);            // Debugging
+        })
     });
 }
 
-function Pie_Chart(dataset, svg_width, svg_height, year) {
+function Pie_Chart(svg_width, svg_height, year) {
 
+    // Setting up variables and dataset to use
+    // var dataset = ;
+    var outer_radius = Math.min(svg_width, svg_height) / 2;
+    var pie = d3.pie();
 }
 window.onload = init;
