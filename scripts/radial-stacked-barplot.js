@@ -1,3 +1,106 @@
+function radialStackedBarplot(dataset) {
+//width and height of svg
+    var w = 300;
+    var h = 300;
+    var innerRadius = 180;
+    var outerRadius = Math.min(w, h) / 2;
+
+//set up the stack
+    var stacks = d3.stack() //generate stacks
+                    .keys(function (d) {
+                        return d.Country;
+                    }); //specify the categories of interest
+
+//set up the svg canvas
+    var svg = d3.select("#vis1")
+                .append("svg")
+                .attr("width", w)
+                .attr("height", h);
+
+//set up the scales
+    var xScale = d3.scaleBand()
+                    .domain(dataset.map(function(d) {return d.Country;}))
+                    .range([0, 2 * Math.PI])
+                    .align(0);
+    
+    var yScale = d3.scaleRadial()
+                    .domain([0, d3.max(dataset, function(d) {
+                        return d.Value;
+                    })])
+                    .range([innerRadius, outerRadius]);
+
+//color scheme to attach to the arcs group
+    var color = d3.scaleOrdinal(d3.schemeCategory10); //d3 native color scheme (no. 10)
+    
+//set up the arcs
+    var groups = svg.selectAll("g")
+                    .data(stacks(dataset))
+                    .enter()
+                    .append("g")
+                    .style("fill", function(d, i) {
+                        return color(i);
+                    })
+                    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    //from here (line 45 - 101): taken from d3 js library examples
+    groups.selectAll("path")
+            .data(function(d) {return d;})
+            .enter()
+            .append("path")
+            .attr("d", d3.arc()
+                        .innerRadius(function(d) { return yScale(d[0]); })
+                        .outerRadius(function(d) { return yScale(d[1]); })
+                        .startAngle(function(d) { return xScale(d.Country); })
+                        .endAngle(function(d) { return xScale(d.Country) + xScale.bandwidth(); })
+                        .padAngle(0.01)
+                        .padRadius(innerRadius)
+            );
+    
+// label indicating countries at xAxis
+    var label = groups.append("g")
+                    .selectAll("g")
+                    .data(dataset)
+                    .enter()
+                    .append("g")
+                    .attr("text-anchor", "middle")
+                    .attr("transform", function(d) {
+                        return "rotate(" + ((xScale(d.Country) + xScale.bandwidth() / 2) * 180 / Math.PI - 90) + ")translate(" + innerRadius + ",0)"; 
+                    });
+    label.append("text")
+        .attr("transform", function(d) {
+            return (xScale(d.Country) + xScale.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(90)translate(0,16)" : "rotate(-90)translate(0,-9)"; 
+        })
+        .text(function(d) { return d.Country; });
+
+//y Axis settings and height of each bars
+    var yAxis = groups.append("g")
+                        .attr("text-anchor", "middle");
+                        
+    var yTicks = yAxis.selectAll("g")
+                .data(yScale.ticks(5).slice(1))
+                .enter()
+                .append("g");
+
+    //cỉcle playing as line responsible for measuring - ticks
+    yTicks.append("circle")
+            .attr("y", function(d) {return -yScale(d);})
+            .attr("dy", "0.35em")
+            .attr("fill", "none")
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 5)
+            .text(yScale.tickFormat(5, "s"));
+
+    yTicks.append("text")
+            .attr("y", function(d) {return -yScale(d);})
+            .attr("dy", "0.35em")
+            .text(yScale.tickFormat(5, "s")); //the value at each tick
+
+    yAxis.append("text")
+            .attr("y", function(d) { return -y(y.ticks(5).pop()); })
+            .attr("dy", "-1em")
+            .text("Population");
+}
+
 function init() {
     d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
         return {
@@ -7,20 +110,44 @@ function init() {
             Variable: d.Variable,   // Full Description of data
             UNIT: d.UNIT,           // Unit code (% or head counts)
             Year: d.Year,           // Year
-            Value: d.Value          // Estimated value
+            Value: d.Value,         // Estimated value
         };
     }).then(function(data) {
-        // Loading the data from 2020 and "maybe" 2021
+        // Loading the data from 2020
         // Each bar will ressemble 1 country, and for each stacked element it will be for each category
 
-        var processedData = data.filter(function(d) {
+        var filteredData = data.filter(function(d) {
             // The only data we need are:
             //      - Total physicians by age range from all countries
             //      - in the latest years (2020 - 2022 depending on the country's data)
             //      - take value with the unit as head counts;
-            return (d.UNIT == "PERSMYNB" && d.Year >= 2020 && (d.VAR == "PAGGTOPY" || d.VAR == "PAGGTU35" || d.VAR == "PAGGT344" || d.VAR == "PAGGT454" || d.VAR == "PAGGT564" || d.VAR == "PAGGT65O"));
+            return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGTOPY" || d.VAR == "PAGGTU35" || d.VAR == "PAGGT344" || d.VAR == "PAGGT454" || d.VAR == "PAGGT564" || d.VAR == "PAGGT65O"));
         });
-        // console.table(processedData);
+        console.table(filteredData);
+
+        //long to wide dataset: need to change to the form
+        // [
+        //     {country: d.Country, PAGGTOPY: d.Value, PAGGTU35: d.Value, PAGGT344: d.Value, PAGGT454: d.Value, ... ncl chia theo VAR},
+        //     {...}, ...
+        // ]
+        // could remove Year as all items have the same year
+        // in progress right now...
+        // var output = d3.nest()
+        //                 .key(function(d) { return d["COU"] })
+        //                 .rollup(function(d) {
+        //                     return d.reduce(function(prev, curr) {
+        //                         prev["COU"] = curr["COU"];
+        //                         prev[curr["VAR"]] = curr["VAR"];
+        //                         return prev;
+        //                     }, {});
+        //                 })
+        //                 .entries(filteredData)
+        //                 .map(function(d) {
+        //                     return d.value;
+        //                 });
+
+        radialStackedBarplot(output);
+
     });
 }
 
