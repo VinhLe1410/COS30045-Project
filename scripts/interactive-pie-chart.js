@@ -25,7 +25,7 @@ function init() {
         var filtered_counts = filtered.filter(function(d) {     // Male physicians and female physicians of Australia (in number)
             return d.Unit == "PERSMYNB";
         });
-            filtered_counts.forEach(function(d) {                   // Example: If you need data from 2020, only female, in Australia 
+            filtered_counts.forEach(function(d) {               // Example: If you need data from 2020, only female, in Australia 
             var Gender;                                         // -> organized_data[2020]["Australia"]["Female"]
             if (d.Variable == "PAGGFEMM") { Gender = "Female";}
             else { Gender = "Male";}
@@ -43,6 +43,7 @@ function init() {
             })
         })
 
+        // Testing
         console.log(organized_data[2021]["Australia"]);
 
         var svg = d3.select("#vis2")
@@ -70,5 +71,6 @@ function Pie_Chart(svg_width, svg_height, year) {
     // var dataset = ;
     var outer_radius = Math.min(svg_width, svg_height) / 2;
     var pie = d3.pie();
+
 }
 window.onload = init;
