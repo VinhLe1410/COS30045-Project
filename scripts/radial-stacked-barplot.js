@@ -1,15 +1,16 @@
 function radialStackedBarplot(dataset) {
 //width and height of svg
-    var w = 300;
-    var h = 300;
-    var innerRadius = 180;
-    var outerRadius = Math.min(w, h) / 2;
+    var w = 500;
+    var h = 500;
+    var innerRadius = 70;
+    var outerRadius = 150;
+    // var outerRadius = Math.min(w, h) / 2;
 
 //set up the stack
+    // list out manually all the keys for stacking to debug
     var stacks = d3.stack() //generate stacks
-                    .keys(function (d) {
-                        return d.Country;
-                    }); //specify the categories of interest
+                    .keys(["PAGGTOPY", "PAGGTU35", "PAGGT344", "PAGGT344", "PAGGT454", "PAGGT564", "PAGGT65O"]); 
+                    //specify the categories of interest
 
 //set up the svg canvas
     var svg = d3.select("#vis1")
@@ -21,37 +22,50 @@ function radialStackedBarplot(dataset) {
     var xScale = d3.scaleBand()
                     .domain(dataset.map(function(d) {return d.Country;}))
                     .range([0, 2 * Math.PI])
-                    .align(0);
+                    .paddingInner(0.05);
+                    // .align(0);
     
     var yScale = d3.scaleRadial()
                     .domain([0, d3.max(dataset, function(d) {
-                        return d.Value;
+                        return d.PAGGTOPY;
                     })])
                     .range([innerRadius, outerRadius]);
 
 //color scheme to attach to the arcs group
-    var color = d3.scaleOrdinal(d3.schemeCategory10); //d3 native color scheme (no. 10)
+    var color = d3.scaleOrdinal(d3.schemeCategory10)
+                    .domain(["PAGGTOPY", "PAGGTU35", "PAGGT344", "PAGGT344", "PAGGT454", "PAGGT564", "PAGGT65O"]) ; //d3 native color scheme (no. 10)
     
 //set up the arcs
-    var groups = svg.selectAll("g")
-                    .data(stacks(dataset))
-                    .enter()
-                    .append("g")
-                    .style("fill", function(d, i) {
-                        return color(i);
-                    })
-                    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    // debugging
+    // var groups = svg.selectAll("g")
+    //                 .data(stacks(dataset))
+    //                 .enter()
+    //                 .append("g")
+    //                 .style("fill", function(d, i) {
+    //                     return color(i);
+    //                 })
+    //                 .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
+    var groups = svg.append("g")
+                    .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
     //from here (line 45 - 101): taken from d3 js library examples
-    groups.selectAll("path")
+    groups.append("g")
+            .selectAll("g")
+            .data(stacks(dataset))
+            .enter()
+            .append("g")
+            .style("fill", function(d, i) {
+                return color(i);
+            })
+            .selectAll("path")
             .data(function(d) {return d;})
             .enter()
             .append("path")
             .attr("d", d3.arc()
                         .innerRadius(function(d) { return yScale(d[0]); })
                         .outerRadius(function(d) { return yScale(d[1]); })
-                        .startAngle(function(d) { return xScale(d.Country); })
-                        .endAngle(function(d) { return xScale(d.Country) + xScale.bandwidth(); })
+                        .startAngle(function(d) { return xScale(d.data.Country); })
+                        .endAngle(function(d) { return xScale(d.data.Country) + xScale.bandwidth(); })
                         .padAngle(0.01)
                         .padRadius(innerRadius)
             );
@@ -82,6 +96,7 @@ function radialStackedBarplot(dataset) {
                 .append("g");
 
     //cỉcle playing as line responsible for measuring - ticks
+    // debugging
     yTicks.append("circle")
             .attr("y", function(d) {return -yScale(d);})
             .attr("dy", "0.35em")
@@ -95,10 +110,10 @@ function radialStackedBarplot(dataset) {
             .attr("dy", "0.35em")
             .text(yScale.tickFormat(5, "s")); //the value at each tick
 
-    yAxis.append("text")
-            .attr("y", function(d) { return -y(y.ticks(5).pop()); })
-            .attr("dy", "-1em")
-            .text("Population");
+    // yAxis.append("text")
+    //         .attr("y", function(d) { return -yScale(yScale.ticks(5).pop()); })
+    //         .attr("dy", "-1em")
+    //         .text("Population");
 }
 
 function init() {
@@ -126,8 +141,9 @@ function init() {
         console.table(filteredData);
 
         //long to wide dataset: need to change to the form
+        //debugging
         // [
-        //     {country: d.Country, PAGGTOPY: d.Value, PAGGTU35: d.Value, PAGGT344: d.Value, PAGGT454: d.Value, ... ncl chia theo VAR},
+            //  {country: d.Country, PAGGTOPY: d.Value, PAGGTU35: d.Value, PAGGT344: d.Value, PAGGT454: d.Value, ... ncl chia theo VAR},
         //     {...}, ...
         // ]
         // could remove Year as all items have the same year
@@ -146,7 +162,18 @@ function init() {
         //                     return d.value;
         //                 });
 
-        radialStackedBarplot(output);
+        var testDataset = [
+            {Country: 'Australia', PAGGTOPY: 100260, PAGGTU35: 25165, PAGGT344: 28087, PAGGT454: 21667, PAGGT564: 15994, PAGGT65O: 7643 },
+            {Country: 'Austria', PAGGTOPY: 47422, PAGGTU35: 9166, PAGGT344: 12364, PAGGT454: 10614, PAGGT564: 12211, PAGGT65O: 2619 },
+            {Country: 'Belgium', PAGGTOPY: 37089, PAGGTU35: 4539, PAGGT344: 8063, PAGGT454: 8362, PAGGT564: 8696, PAGGT65O: 6131 },
+            {Country: 'Canada', PAGGTOPY: 105504, PAGGTU35: 26409, PAGGT344: 24270, PAGGT454: 20524, PAGGT564: 19300, PAGGT65O: 10897 },
+            {Country: 'Czechia', PAGGTOPY: 43810, PAGGTU35: 9963, PAGGT344: 9343, PAGGT454: 9184, PAGGT564: 8020, PAGGT65O: 5990 },
+            {Country: 'Denmark', PAGGTOPY: 25522, PAGGTU35: 6221, PAGGT344: 6866, PAGGT454: 5163, PAGGT564: 4581, PAGGT65O: 2419 },
+            {Country: 'Finland', PAGGTOPY: 19970, PAGGTU35: 5252, PAGGT344: 5610, PAGGT454: 4371, PAGGT564: 4167, PAGGT65O: 570 },
+            {Country: 'France', PAGGTOPY: 214293, PAGGTU35: 34393, PAGGT344: 41243, PAGGT454: 40744, PAGGT564: 59562, PAGGT65O: 34177 },
+        ];
+
+        radialStackedBarplot(testDataset);
 
     });
 }
