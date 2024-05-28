@@ -5,12 +5,32 @@ datalist {
     width: 500px;
 
 }
-  
-/* option {
-    padding: 0;
-} */
+
   
 input[type="range"] {
     width: 500px;
     margin: 0;
+}
+
+/* Exclusively for div, svg element for Pie_Chart */
+
+div {
+    width: 100vw;
+    /* border: solid 1px red; */
+    overflow: auto;
+}
+
+#svg_pie_chart {
+    /* border: solid 3px green; */
+    display: block;
+    width:40%;
+}
+
+#svg_bar_chart {
+    display: block;
+    width: 60%;
+}
+
+svg:nth-child(1) {
+    float: left;
 }

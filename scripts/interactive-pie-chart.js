@@ -1,7 +1,9 @@
-const w = 1000;
-const h = 500;
+const w_pie = 400;
+const h_pie = 400;
+const w_chart = 600;
+const h_chart = 400;
 
-const outer_radius_max = Math.min(w, h) / 2;
+const outer_radius_max = w_pie/2;
 const outer_radius = outer_radius_max * 0.9;
 
 var organized_data = {};
@@ -17,17 +19,14 @@ function init() {
             Value: d.Value          // Estimated value
         };
     }).then(function(data) {
-        var filtered = data.filter(function(d) {
+        var filtered_counts = data.filter(function(d) {
             // The only data we need are:
             //      - From Australia;
             //      - Total female and male;
             //      - Both head counts and % of head counts;
             return (d.Country == "Australia" && 
-                    (d.Variable == "PAGGFEMM" || d.Variable == "PAGGHOMM"));
-        });
-
-        var filtered_counts = filtered.filter(function(d) {     // Male physicians and female physicians of Australia (in number)
-            return d.Unit == "PERSMYNB";
+                    (d.Variable == "PAGGFEMM" || d.Variable == "PAGGHOMM") &&
+                    d.Unit == "PERSMYNB");
         });
 
         filtered_counts.forEach(function(d) {                   // Example: If you need data from 2020, only female, in Australia 
@@ -44,28 +43,35 @@ function init() {
 
             organized_data[d.Year][d.Country].push({
                 gender: Gender,
-                value: +d.Value    // Ensure the value is a number
+                value: +d.Value                                 // Ensure the value is a number
             });
         });
 
         // Testing
         console.log(organized_data[2021]["Australia"]);
 
-        var svg = d3.select("#vis2")
-                    .append("svg")
-                    .attr("width", w)
-                    .attr("height", h);
+        var svg = d3.select("#visualisation").append("svg")
+                    .attr("viewBox", "0 0 400 400")
+                    .attr("id", "svg_pie_chart");
+                    // .attr("width", w_pie)
+                    // .attr("height", h_pie);
+        
+        var svg2 = d3.select("#visualisation").append("svg")
+                    .attr("viewBox", "0 0 600 400")
+                    .attr("id", "svg_bar_chart");
+                    // .attr("width", w_chart)
+                    // .attr("height", h_chart);
 
         const slider_input = document.querySelector("#slider_year");
         var current_year = slider_input.value;
 
         console.log ("Currently the slider is at " + current_year); // Debugging
-        Pie_Chart(svg, w, h, current_year);
+        Pie_Chart(svg, w_pie, h_pie, current_year);
         
         slider_input.addEventListener("input", (event) => {         // Event listener for changes of the slider in HTML
             current_year = event.target.value;
             console.log ("Now it's at " + current_year);            // Debugging
-            Update_Pie(svg, w, h, current_year);
+            Update_Pie(svg, w_pie, h_pie, current_year);
         });
     });
 }
