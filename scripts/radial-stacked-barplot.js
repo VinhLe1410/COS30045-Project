@@ -4,9 +4,7 @@ function longToWide(dataset) {
         v => Object.fromEntries(v.map(d => [d.VAR, d.Value])),
         d => d.COU
     );
-
     var result = Array.from(longToWideData, ([key, value]) => ({COU: key, ...value}));
-
     return result;
 }
 
@@ -98,7 +96,8 @@ function radialStackedBarplot(dataset, keysDomain) {
                 return (xScale(d.COU) + xScale.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(90)translate(0,16)" : "rotate(-90)translate(0,-9)"; 
             })
             .text(function(d) { return d.COU; })
-            .attr("font-size", "8px");
+            .attr("font-size", "8px")
+            .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
 
 //y Axis settings and height of each bars
     var yAxis = groups.append("g")
@@ -114,7 +113,7 @@ function radialStackedBarplot(dataset, keysDomain) {
     yTicks.append("circle")
             .attr("r", yScale)
             // .attr("dy", "0.35em")
-            .attr("stroke", "#000")
+            .attr("stroke", "#808080")
             .attr("fill", "none")
             .attr("stroke-width", 0.5);
 
@@ -122,13 +121,15 @@ function radialStackedBarplot(dataset, keysDomain) {
             .attr("y", function(d) {return -yScale(d);})
             .attr("dy", "0.35em")
             .text(yScale.tickFormat(5, "s"))
-            .attr("font-size", "12px"); //the value at each tick
+            .attr("font-size", "12px")
+            .attr("font-family", "Gill Sans, Lucida Sans, sans-serif"); //the value at each tick
 
     yAxis.append("text")
             .attr("y", function(d) { return -yScale(yScale.ticks(5).pop()); })
             .attr("dy", "-1.5em")
             .text("Population")
-            .attr("font-size", "14px");
+            .attr("font-size", "14px")
+            .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
 
 // legend
     var legend = groups.append("g")
@@ -137,7 +138,7 @@ function radialStackedBarplot(dataset, keysDomain) {
                         .enter()
                         .append("g")
                         .attr("transform", function (d, i) {
-                            return "translate(-75," + (i - 2.75) * 20 + ")"; 
+                            return "translate(-75," + (i - 2.5) * 20 + ")"; 
                         });
 
     legend.append("rect")
@@ -155,6 +156,7 @@ function radialStackedBarplot(dataset, keysDomain) {
                 if (d == "PAGGT564" || d == "PAGGF564" || d == "PAGGM564") return "55 - 64 years old";
                 if (d == "PAGGT65O" || d == "PAGGF65O" || d == "PAGGM65O") return "65 - 74 years old";
             })
+            .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
 }
 
 
@@ -169,16 +171,9 @@ d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
         Value: +d.Value,         // Estimated value
     };
 }).then(function(data) {
-    // Loading the data from 2020
-    // Each bar will ressemble 1 country, and for each stacked element it will be for each category
-
     d3.select("#total")
         .on("click", function() {
             var filteredDataTotal = data.filter(function(d) {
-                // The only data we need are:
-                //      - Total physicians by age range from all countries
-                //      - in the latest years (2020 - 2022 depending on the country's data)
-                //      - take value with the unit as head counts;
                 return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGTOPY" || d.VAR == "PAGGTU35" || d.VAR == "PAGGT344" || d.VAR == "PAGGT454" || d.VAR == "PAGGT564" || d.VAR == "PAGGT65O"));
             });
             
@@ -197,10 +192,6 @@ d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
     d3.select("#female")
         .on("click", function() {
             var filteredDataFemale = data.filter(function(d) {
-                // The only data we need are:
-                //      - Female physicians by age range from all countries
-                //      - in the latest years (2020 - 2022 depending on the country's data)
-                //      - take value with the unit as head counts;
                 return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGFEMM" || d.VAR == "PAGGFU35" || d.VAR == "PAGGF344" || d.VAR == "PAGGF454" || d.VAR == "PAGGF564" || d.VAR == "PAGGF65O"));
             });
             
@@ -219,10 +210,6 @@ d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
     d3.select("#male")
         .on("click", function() {
             var filteredDataMale = data.filter(function(d) {
-                // The only data we need are:
-                //      - Male physicians by age range from all countries
-                //      - in the latest years (2020 - 2022 depending on the country's data)
-                //      - take value with the unit as head counts;
                 return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGHOMM" || d.VAR == "PAGGMU35" || d.VAR == "PAGGM344" || d.VAR == "PAGGM454" || d.VAR == "PAGGM564" || d.VAR == "PAGGM65O"));
             });
             
