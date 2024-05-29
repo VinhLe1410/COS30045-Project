@@ -48,11 +48,19 @@ function radialStackedBarplot(dataset, keysDomain) {
 //color scheme to attach to the arcs group
     var color = d3.scaleOrdinal(d3.schemeTableau10)
                     .domain(keysDomain) ; //d3 native color scheme (no. 10)
-    
+
 //set up the arcs
     var groups = svg.append("g")
                     .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
+    var arc = d3.arc()
+                .innerRadius(function(d) { return yScale(d[0]); })
+                .outerRadius(function(d) { return yScale(d[1]); })
+                .startAngle(function(d) { return xScale(d.data.COU); })
+                .endAngle(function(d) { return xScale(d.data.COU) + xScale.bandwidth(); })
+                .padAngle(0.01)
+                .padRadius(innerRadius);
+    
     //from here (line 45 - 101): taken from d3 js library examples
     groups.append("g")
             .selectAll("g")
@@ -66,14 +74,45 @@ function radialStackedBarplot(dataset, keysDomain) {
             .data(function(d) {return d;})
             .enter()
             .append("path")
-            .attr("d", d3.arc()
-                        .innerRadius(function(d) { return yScale(d[0]); })
-                        .outerRadius(function(d) { return yScale(d[1]); })
-                        .startAngle(function(d) { return xScale(d.data.COU); })
-                        .endAngle(function(d) { return xScale(d.data.COU) + xScale.bandwidth(); })
-                        .padAngle(0.01)
-                        .padRadius(innerRadius)
-            );
+            .attr("d", arc);
+
+    groups.selectAll("path")
+            .on("mouseover", function(event, d) {
+                d3.select(this)
+                    .attr("original-fill", d3.select(this).attr('fill'))
+                    .attr("fill", "red")
+                    .transition()
+                    .duration(1000);
+
+                var [xPosInRadial, yPosInRadial] = arc.centroid(d);
+
+                tooltip = svg.append("rect")
+                                .attr("id", "tooltipBox")
+                                .attr("x", xPosInRadial + outerRadius + 10)
+                                .attr("y", yPosInRadial + outerRadius + 10)
+                                .attr("width", "105px")
+                                .attr("height", "12px")
+                                .attr("fill", "white")
+                                .attr("opacity", 0.8);
+
+                tooltipText = svg.append("text")
+                                    .attr("id", "tooltipText")
+                                    .attr("x", xPosInRadial + outerRadius + 15)
+                                    .attr("y", yPosInRadial + outerRadius + 20)
+                                    .text("Number of Physicians: " + d[1])
+                                    .attr("font-size", "8px")
+                                    .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
+            })
+            .on("mouseout", function() {
+                d3.select(this)
+                    .attr("fill", d3.select(this).attr('original-fill'))
+                    .transition()
+                    .duration(1000);
+
+                svg.select("#tooltipBox").remove();
+                svg.select("#tooltipText").remove();
+
+            })
     
 // label indicating countries at xAxis
     var label = groups.append("g")
