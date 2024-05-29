@@ -1,17 +1,29 @@
-function radialStackedBarplot(dataset) {
+function longToWide(dataset) {
+    var longToWideData = d3.rollup(
+        dataset, 
+        v => Object.fromEntries(v.map(d => [d.VAR, d.Value])),
+        d => d.COU
+    );
+
+    var result = Array.from(longToWideData, ([key, value]) => ({COU: key, ...value}));
+
+    return result;
+}
+
+function radialStackedBarplot(dataset, keysDomain) {
+//reset svg
+    d3.select("svg").remove();
 //width and height of svg
-    var w = 700;
-    var h = 700;
+    var w = 900;
+    var h = 900;
     var innerRadius = 125;
-    // var outerRadius = 250;
-    var outerRadius = Math.min(w, h) / 2.2;
+    // var outerRadius = 350;
+    var outerRadius = Math.min(w, h) / 2;
 
 //set up the stack
     // list out manually all the keys for stacking to debug
     var stacks = d3.stack() //generate stacks
-                    .keys(
-                        ["PAGGTU35", "PAGGT344", "PAGGT344", "PAGGT454", "PAGGT564", "PAGGT65O"]
-                    ); 
+                    .keys(keysDomain); 
                     //specify the categories of interest
 
 //set up the svg canvas
@@ -24,31 +36,22 @@ function radialStackedBarplot(dataset) {
     var xScale = d3.scaleBand()
                     .domain(dataset.map(function(d) {return d.COU;}))
                     .range([0, 2 * Math.PI])
-                    .paddingInner(0.05);
-                    // .align(0);
+                    .paddingInner(0.05)
+                    .align(0);
     
     var yScale = d3.scaleRadial()
                     .domain([0, d3.max(dataset, function(d) {
-                        return d.PAGGTOPY;
+                        if (typeof d.PAGGTOPY != 'undefined') return d.PAGGTOPY;
+                        if (typeof d.PAGGHOMM != 'undefined') return d.PAGGHOMM;
+                        if (typeof d.PAGGFEMM != 'undefined') return d.PAGGFEMM;
                     })])
                     .range([innerRadius, outerRadius]);
 
 //color scheme to attach to the arcs group
-    var color = d3.scaleOrdinal(d3.schemeCategory10)
-                    .domain(
-                        ["PAGGTU35", "PAGGT344", "PAGGT454", "PAGGT564", "PAGGT65O"]
-                    ) ; //d3 native color scheme (no. 10)
+    var color = d3.scaleOrdinal(d3.schemeTableau10)
+                    .domain(keysDomain) ; //d3 native color scheme (no. 10)
     
 //set up the arcs
-    // debugging
-    // var groups = svg.selectAll("g")
-    //                 .data(stacks(dataset))
-    //                 .enter()
-    //                 .append("g")
-    //                 .style("fill", function(d, i) {
-    //                     return color(i);
-    //                 })
-    //                 .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
     var groups = svg.append("g")
                     .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
@@ -130,7 +133,7 @@ function radialStackedBarplot(dataset) {
 // legend
     var legend = groups.append("g")
                         .selectAll("g")
-                        .data(["PAGGTU35", "PAGGT344", "PAGGT344", "PAGGT454", "PAGGT564", "PAGGT65O"])
+                        .data(keysDomain)
                         .enter()
                         .append("g")
                         .attr("transform", function (d, i) {
@@ -146,55 +149,93 @@ function radialStackedBarplot(dataset) {
             .attr("x", 24)
             .attr("y", 9)
             .text(function (d) { 
-                if (d == "PAGGTU35") return "Under 35 years old";
-                if (d == "PAGGT344") return "35 - 44 years old";
-                if (d == "PAGGT454") return "45 - 54 years old";
-                if (d == "PAGGT564") return "55 - 64 years old";
-                if (d == "PAGGT65O") return "65 - 74 years old";
+                if (d == "PAGGTU35" || d == "PAGGFU35" || d == "PAGGMU35") return "Under 35 years old";
+                if (d == "PAGGT344" || d == "PAGGF344" || d == "PAGGM344") return "35 - 44 years old";
+                if (d == "PAGGT454" || d == "PAGGF454" || d == "PAGGM454") return "45 - 54 years old";
+                if (d == "PAGGT564" || d == "PAGGF564" || d == "PAGGM564") return "55 - 64 years old";
+                if (d == "PAGGT65O" || d == "PAGGF65O" || d == "PAGGM65O") return "65 - 74 years old";
             })
 }
 
-function init() {
-    d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
-        return {
-            VAR: d.VAR,             // Data code (total female, total male, etc.)
-            COU: d.COU,             // Country code
-            Country: d.Country,     // Country
-            Variable: d.Variable,   // Full Description of data
-            UNIT: d.UNIT,           // Unit code (% or head counts)
-            Year: d.Year,           // Year
-            Value: d.Value,         // Estimated value
-        };
-    }).then(function(data) {
-        // Loading the data from 2020
-        // Each bar will ressemble 1 country, and for each stacked element it will be for each category
 
-        var filteredData = data.filter(function(d) {
-            // The only data we need are:
-            //      - Total physicians by age range from all countries
-            //      - in the latest years (2020 - 2022 depending on the country's data)
-            //      - take value with the unit as head counts;
-            return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGTOPY" || d.VAR == "PAGGTU35" || d.VAR == "PAGGT344" || d.VAR == "PAGGT454" || d.VAR == "PAGGT564" || d.VAR == "PAGGT65O"));
+d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
+    return {
+        VAR: d.VAR,             // Data code (total female, total male, etc.)
+        COU: d.COU,             // Country code
+        Country: d.Country,     // Country
+        Variable: d.Variable,   // Full Description of data
+        UNIT: d.UNIT,           // Unit code (% or head counts)
+        Year: d.Year,           // Year
+        Value: +d.Value,         // Estimated value
+    };
+}).then(function(data) {
+    // Loading the data from 2020
+    // Each bar will ressemble 1 country, and for each stacked element it will be for each category
+
+    d3.select("#total")
+        .on("click", function() {
+            var filteredDataTotal = data.filter(function(d) {
+                // The only data we need are:
+                //      - Total physicians by age range from all countries
+                //      - in the latest years (2020 - 2022 depending on the country's data)
+                //      - take value with the unit as head counts;
+                return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGTOPY" || d.VAR == "PAGGTU35" || d.VAR == "PAGGT344" || d.VAR == "PAGGT454" || d.VAR == "PAGGT564" || d.VAR == "PAGGT65O"));
+            });
+            
+            var wideArrayTotal = longToWide(filteredDataTotal);
+            
+            var processedDataTotal = wideArrayTotal.filter(function(d) {
+                return typeof d.PAGGTU35 != 'undefined' && typeof d.PAGGT344 != 'undefined' && typeof d.PAGGT454 != 'undefined' && typeof d.PAGGT564 != 'undefined' && typeof d.PAGGT65O != 'undefined';
+            });
+
+            var stacksKeyTotal = ["PAGGTU35", "PAGGT344", "PAGGT454", "PAGGT564", "PAGGT65O"];
+
+            // console.log(processedDataTotal);
+            radialStackedBarplot(processedDataTotal, stacksKeyTotal);
         });
-        console.table(filteredData);
 
-        var longToWideData = d3.rollup(
-            filteredData, 
-            v => Object.fromEntries(v.map(d => [d.VAR, d.Value])),
-            d => d.COU
-        );
+    d3.select("#female")
+        .on("click", function() {
+            var filteredDataFemale = data.filter(function(d) {
+                // The only data we need are:
+                //      - Female physicians by age range from all countries
+                //      - in the latest years (2020 - 2022 depending on the country's data)
+                //      - take value with the unit as head counts;
+                return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGFEMM" || d.VAR == "PAGGFU35" || d.VAR == "PAGGF344" || d.VAR == "PAGGF454" || d.VAR == "PAGGF564" || d.VAR == "PAGGF65O"));
+            });
+            
+            var wideArrayFemale = longToWide(filteredDataFemale);
 
-        var wideArray = Array.from(longToWideData, ([key, value]) => ({COU: key, ...value}))
+            var processedDataFemale = wideArrayFemale.filter(function(d) {
+                return typeof d.PAGGFU35 != 'undefined' && typeof d.PAGGF344 != 'undefined' && typeof d.PAGGF454 != 'undefined' && typeof d.PAGGF564 != 'undefined' && typeof d.PAGGF65O != 'undefined';
+            });
 
-        console.log(wideArray);
+            var stacksKeyFemale = ["PAGGFU35", "PAGGF344", "PAGGF454", "PAGGF564", "PAGGF65O"];
 
-        var processedData = wideArray.filter(function(d) {
-            return typeof d.PAGGTU35 != 'undefined' && typeof d.PAGGT344 != 'undefined' && typeof d.PAGGT454 != 'undefined' && typeof d.PAGGT564 != 'undefined' && typeof d.PAGGT65O != 'undefined';
+            // console.log(processedDataFemale);
+            radialStackedBarplot(processedDataFemale, stacksKeyFemale);
         });
 
-        radialStackedBarplot(processedData);
+    d3.select("#male")
+        .on("click", function() {
+            var filteredDataMale = data.filter(function(d) {
+                // The only data we need are:
+                //      - Male physicians by age range from all countries
+                //      - in the latest years (2020 - 2022 depending on the country's data)
+                //      - take value with the unit as head counts;
+                return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGHOMM" || d.VAR == "PAGGMU35" || d.VAR == "PAGGM344" || d.VAR == "PAGGM454" || d.VAR == "PAGGM564" || d.VAR == "PAGGM65O"));
+            });
+            
+            var wideArrayMale = longToWide(filteredDataMale);
 
-    });
-}
+            var processedDataMale = wideArrayMale.filter(function(d) {
+                return typeof d.PAGGMU35 != 'undefined' && typeof d.PAGGM344 != 'undefined' && typeof d.PAGGM454 != 'undefined' && typeof d.PAGGM564 != 'undefined' && typeof d.PAGGM65O != 'undefined';
+            });
+            
+            var stacksKeyMale = ["PAGGMU35", "PAGGM344", "PAGGM454", "PAGGM564", "PAGGM65O"];
 
-window.onload = init;
+            // console.log(processedDataMale);
+            radialStackedBarplot(processedDataMale, stacksKeyMale);
+        });
+});
+
