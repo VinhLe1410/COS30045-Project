@@ -1,0 +1,14 @@
+#visualisation {
+    width: 100vw;
+    height: 100vh;
+    /* border: solid 1px red; */
+    overflow: auto;
+}
+
+#svg_radial_bar_plot {
+    /* border: solid 3px green; */
+    display: block;
+    /* display: block; */
+    margin: auto;
+    height: 80%;
+}

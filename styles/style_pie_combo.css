@@ -1,34 +1,33 @@
+/* Exclusively for Pie_Chart */
+
 datalist {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     width: 500px;
-
 }
-
   
 input[type="range"] {
     width: 500px;
     margin: 0;
 }
 
-/* Exclusively for div, svg element for Pie_Chart */
-
-div {
-    width: 100vw;
-    /* border: solid 1px red; */
-    overflow: auto;
-}
-
 #svg_pie_chart {
     /* border: solid 3px green; */
     display: block;
-    width:40%;
+    width: 40%;
 }
 
 #svg_bar_chart {
     display: block;
     width: 60%;
+}
+
+#visualisation {
+    width: 100vw;
+    /* height: 100vh; */
+    /* border: solid 1px red; */
+    overflow: auto;
 }
 
 svg:nth-child(1) {

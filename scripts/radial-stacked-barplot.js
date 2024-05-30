@@ -25,10 +25,10 @@ function radialStackedBarplot(dataset, keysDomain) {
                     //specify the categories of interest
 
 //set up the svg canvas
-    var svg = d3.select("#vis1")
+    var svg = d3.select("#visualisation")
                 .append("svg")
-                .attr("width", w)
-                .attr("height", h);
+                .attr("id", "svg_radial_bar_plot")
+                .attr("viewBox", "0 0 900 900");
 
 //set up the scales
     var xScale = d3.scaleBand()

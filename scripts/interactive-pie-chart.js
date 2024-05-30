@@ -20,13 +20,9 @@ function init() {
         };
     }).then(function(data) {
         var filtered_counts = data.filter(function(d) {
-            // The only data we need are:
-            //      - From Australia;
-            //      - Total female and male;
-            //      - Both head counts and % of head counts;
-            return (d.Country == "Australia" && 
-                    (d.Variable == "PAGGFEMM" || d.Variable == "PAGGHOMM") &&
-                    d.Unit == "PERSMYNB");
+            return (d.Country == "Australia" &&                                 // From Australia;
+                    (d.Variable == "PAGGFEMM" || d.Variable == "PAGGHOMM") &&   // Total female and male;
+                    d.Unit == "PERSMYNB");                                      // Head counts;
         });
 
         filtered_counts.forEach(function(d) {                   // Example: If you need data from 2020, only female, in Australia 
@@ -47,30 +43,25 @@ function init() {
             });
         });
 
-        // Testing
-        console.log(organized_data[2021]["Australia"]);
+        console.log(organized_data[2021]["Australia"]);         // Log for testing
 
         var svg = d3.select("#visualisation").append("svg")
                     .attr("viewBox", "0 0 400 400")
                     .attr("id", "svg_pie_chart");
-                    // .attr("width", w_pie)
-                    // .attr("height", h_pie);
         
         var svg2 = d3.select("#visualisation").append("svg")
                     .attr("viewBox", "0 0 600 400")
                     .attr("id", "svg_bar_chart");
-                    // .attr("width", w_chart)
-                    // .attr("height", h_chart);
 
         const slider_input = document.querySelector("#slider_year");
         var current_year = slider_input.value;
 
-        console.log ("Currently the slider is at " + current_year); // Debugging
+        console.log ("Currently the slider is at " + current_year);
         Pie_Chart(svg, w_pie, h_pie, current_year);
         
-        slider_input.addEventListener("input", (event) => {         // Event listener for changes of the slider in HTML
+        slider_input.addEventListener("input", (event) => {     // Event listener for changes of the slider in HTML
             current_year = event.target.value;
-            console.log ("Now it's at " + current_year);            // Debugging
+            console.log ("Now it's at " + current_year);        // Log for testing
             Update_Pie(svg, w_pie, h_pie, current_year);
         });
     });
@@ -193,6 +184,10 @@ function Update_Pie(svg, svg_width, svg_height, year) {
 
     // Remove old arcs
     arcs.exit().remove();
+}
+
+function Bar_Chart(svg, svg_width, svg_height, year) {
+
 }
 
 window.onload = init;
