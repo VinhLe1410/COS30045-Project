@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Physicians by Age and Gender | Visualisation</title>
+    <title>Physicians by Age and Gender | Radial Stacked Barplot</title>
 
     <!-- refer to D3 library v7 -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -17,21 +17,143 @@
     <script src="scripts/radial-stacked-barplot.js"></script>
 </head>
 <body>
-    <h1>Population of Physicians Regarding Age Groups of OECD Members and Partners in 2020.</h1>
-    <h2>About the Visualisation</h2>
-    <p>Description, explanation, etc.</p>
-    <ul>
-        <li>What the graph is about, what questions it answers</li>
-        <li>How to read the graphs</li>
-        <li>Note the countries (each COU = which country)</li>
-        <li>How to use the interactive sections</li>
-    </ul>
-    <h2>Visualisation</h2>
-    <button id="total">Total physicians</button>
-    <button id="female">Female physicians</button>
-    <button id="male">Male physicians</button>
-    <p id="vis1"></p>
-    
-    
+    <header>
+        <div>
+            <nav>
+                <ul>
+                    <li><a href="/home.html">Home</a></li>
+                    <li><a href="/radialStackedBarplot.html">Radial Stacked Barplot</a></li>
+                    <li><a href="/interactivePieChart.html">Pie and Bar Chart</a></li>
+                    <li><a href="/about.html">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <section>
+        <h1>Population of Physicians Regarding Age Groups of OECD Members and Partners in 2020.</h1>
+        <div>
+            <h2>About the Visualisation</h2>
+            <div>
+                <p>
+                    This visualisation aims to compare number of physicians divided into age groups among OECD member and partner countries in 2020. 
+                    Total, female, and male physicians are used for this comparison.
+                    <br>
+                    The chart provided buttons to choose among radial stacked charts for Total (both female and male physicians), and Female, and Male specific physicians.
+                    While reading the chart, web users could mouse-over on a bar to show its specific data of number of physicians on the hovered country and age group.
+                </p>
+            </div>
+            <div>
+                <table>
+                    <caption>Country Code Notation:</caption>
+                    <tr>
+                        <th>Code</th>
+                        <td>AUS</td>
+                        <td>AUT</td>
+                        <td>BEL</td>
+                        <td>CAN</td>
+                        <td>CZE</td>
+                        <td>DNK</td>
+                        <td>FIN</td>
+                        <td>FRA</td>
+                        <td>DEU</td>
+                        <td>GRC</td>
+                        <td>HUN</td>
+                        <td>ISL</td>
+                        <td>IRL</td>
+                        <td>ITA</td>
+                        <td>JPN</td>
+                        <td>KOR</td>
+                        <td>NLD</td>
+                        <td>NZL</td>
+                        <td>NOR</td>
+                        <td>POL</td>
+                        <td>SVK</td>
+                        <td>ESP</td>
+                        <td>SWE</td>
+                        <td>CHE</td>
+                        <td>TUR</td>
+                        <td>GBR</td>
+                        <td>USA</td>
+                        <td>CHL</td>
+                        <td>EST</td>
+                        <td>ISR</td>
+                        <td>SVN</td>
+                        <td>LVA</td>
+                        <td>LTU</td>
+                        <td>COL</td>
+                        <td>BGR</td>
+                        <td>ROU</td>
+                        <td>HRV</td>
+                    </tr>
+                    <tr>
+                        <th>Country</th>
+                        <td>Australia</td>
+                        <td>Austria</td>
+                        <td>Belgium</td>
+                        <td>Canada</td>
+                        <td>Czechia</td>
+                        <td>Denmark</td>
+                        <td>Finland</td>
+                        <td>France</td>
+                        <td>Germany</td>
+                        <td>Greece</td>
+                        <td>Hungary</td>
+                        <td>Iceland</td>
+                        <td>Ireland</td>
+                        <td>Italy</td>
+                        <td>Japan</td>
+                        <td>Korea</td>
+                        <td>Netherland</td>
+                        <td>New Zealand</td>
+                        <td>Norway</td>
+                        <td>Poland</td>
+                        <td>Slovak Republic</td> 
+                        <td>Spain</td>
+                        <td>Sweden</td>
+                        <td>Switzerland</td>
+                        <td>Türkiye</td>
+                        <td>United Kingdom</td>
+                        <td>United States</td>
+                        <td>Chile</td>
+                        <td>Estonia</td>
+                        <td>Israel</td>
+                        <td>Slovenia</td>
+                        <td>Latvia</td>
+                        <td>Lithuania</td>
+                        <td>Colombia</td>
+                        <td>Bulgaria</td>
+                        <td>Romania</td>
+                        <td>Croatia</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div>
+            <h2>Visualisation</h2>
+            <button id="total">Total physicians</button>
+            <button id="female">Female physicians</button>
+            <button id="male">Male physicians</button>
+            <p id="vis1"></p>
+        </div>
+    </section>
+    <footer>
+        <div>
+            <p>
+                COS30045 Data Visualisation
+                <br>
+                A Dive into Gender Equality of Physicians in Australia and Other Countries.
+            </p>
+        </div>
+        <div>
+            <nav>
+                <ul>
+                    <li><a href="/home.html">Home</a></li>
+                    <li><a href="/radialStackedBarplot.html">Radial Stacked Barplot</a></li>
+                    <li><a href="/interactivePieChart.html">Pie and Bar Chart</a></li>
+                    <li><a href="/about.html">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </footer>
 </body>
 </html>
