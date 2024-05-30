@@ -99,7 +99,7 @@ function radialStackedBarplot(dataset, keysDomain) {
                                     .attr("id", "tooltipText")
                                     .attr("x", xPosInRadial + outerRadius + 15)
                                     .attr("y", yPosInRadial + outerRadius + 20)
-                                    .text("Number of Physicians: " + d[1])
+                                    .text("Number of Physicians: " + (d[1] - d[0]))
                                     .attr("font-size", "8px")
                                     .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
             })
