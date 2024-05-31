@@ -5,6 +5,8 @@ function longToWide(dataset) {
         d => d.COU
     );
     var result = Array.from(longToWideData, ([key, value]) => ({COU: key, ...value}));
+    
+    console.log(result);
     return result;
 }
 
@@ -46,8 +48,9 @@ function radialStackedBarplot(dataset, keysDomain) {
                     .range([innerRadius, outerRadius]);
 
 //color scheme to attach to the arcs group
-    var color = d3.scaleOrdinal(d3.schemeTableau10)
-                    .domain(keysDomain) ; //d3 native color scheme (no. 10)
+    var color = d3.scaleOrdinal()
+                    .domain(keysDomain)
+                    .range(["#E69F00","#56B4E9","#009E73","#0072B2","#D55E00","#CC79A7"]) ; //d3 native color scheme (no. 10)
 
 //set up the arcs
     var groups = svg.append("g")
@@ -80,7 +83,7 @@ function radialStackedBarplot(dataset, keysDomain) {
             .on("mouseover", function(event, d) {
                 d3.select(this)
                     .attr("original-fill", d3.select(this).attr('fill'))
-                    .attr("fill", "red")
+                    .attr("fill", "#F0E442")
                     .transition()
                     .duration(1000);
 
@@ -206,14 +209,14 @@ d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
         Country: d.Country,     // Country
         Variable: d.Variable,   // Full Description of data
         UNIT: d.UNIT,           // Unit code (% or head counts)
-        Year: d.Year,           // Year
+        Year: +d.Year,           // Year
         Value: +d.Value,         // Estimated value
     };
 }).then(function(data) {
     d3.select("#total")
         .on("click", function() {
             var filteredDataTotal = data.filter(function(d) {
-                return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGTOPY" || d.VAR == "PAGGTU35" || d.VAR == "PAGGT344" || d.VAR == "PAGGT454" || d.VAR == "PAGGT564" || d.VAR == "PAGGT65O"));
+                return (d.UNIT == "PERSMYNB" && d.Year == 2021 && (d.VAR == "PAGGTOPY" || d.VAR == "PAGGTU35" || d.VAR == "PAGGT344" || d.VAR == "PAGGT454" || d.VAR == "PAGGT564" || d.VAR == "PAGGT65O"));
             });
             
             var wideArrayTotal = longToWide(filteredDataTotal);
@@ -224,16 +227,17 @@ d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
 
             var stacksKeyTotal = ["PAGGTU35", "PAGGT344", "PAGGT454", "PAGGT564", "PAGGT65O"];
 
-            // console.log(processedDataTotal);
+            console.log(processedDataTotal);
             radialStackedBarplot(processedDataTotal, stacksKeyTotal);
         });
 
     d3.select("#female")
         .on("click", function() {
             var filteredDataFemale = data.filter(function(d) {
-                return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGFEMM" || d.VAR == "PAGGFU35" || d.VAR == "PAGGF344" || d.VAR == "PAGGF454" || d.VAR == "PAGGF564" || d.VAR == "PAGGF65O"));
+                return (d.UNIT == "PERSMYNB" && d.Year == 2021 && (d.VAR == "PAGGFEMM" || d.VAR == "PAGGFU35" || d.VAR == "PAGGF344" || d.VAR == "PAGGF454" || d.VAR == "PAGGF564" || d.VAR == "PAGGF65O"));
             });
-            
+            console.log(filteredDataFemale);
+
             var wideArrayFemale = longToWide(filteredDataFemale);
 
             var processedDataFemale = wideArrayFemale.filter(function(d) {
@@ -242,14 +246,14 @@ d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
 
             var stacksKeyFemale = ["PAGGFU35", "PAGGF344", "PAGGF454", "PAGGF564", "PAGGF65O"];
 
-            // console.log(processedDataFemale);
+            console.log(processedDataFemale);
             radialStackedBarplot(processedDataFemale, stacksKeyFemale);
         });
 
     d3.select("#male")
         .on("click", function() {
             var filteredDataMale = data.filter(function(d) {
-                return (d.UNIT == "PERSMYNB" && d.Year == 2020 && (d.VAR == "PAGGHOMM" || d.VAR == "PAGGMU35" || d.VAR == "PAGGM344" || d.VAR == "PAGGM454" || d.VAR == "PAGGM564" || d.VAR == "PAGGM65O"));
+                return (d.UNIT == "PERSMYNB" && d.Year == 2021 && (d.VAR == "PAGGHOMM" || d.VAR == "PAGGMU35" || d.VAR == "PAGGM344" || d.VAR == "PAGGM454" || d.VAR == "PAGGM564" || d.VAR == "PAGGM65O"));
             });
             
             var wideArrayMale = longToWide(filteredDataMale);
@@ -260,7 +264,7 @@ d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
             
             var stacksKeyMale = ["PAGGMU35", "PAGGM344", "PAGGM454", "PAGGM564", "PAGGM65O"];
 
-            // console.log(processedDataMale);
+            console.log(processedDataMale);
             radialStackedBarplot(processedDataMale, stacksKeyMale);
         });
 });
