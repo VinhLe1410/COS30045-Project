@@ -1,3 +1,6 @@
+#container {
+    display: flex;
+}
 #visualisation {
     width: 100vw;
     height: 100vh;
@@ -10,5 +13,18 @@
     display: block;
     /* display: block; */
     margin: auto;
-    height: 80%;
+    height: 100%;
+}
+
+#countryTable {
+    /* margin-right: 20px; */
+    /* border-collapse: collapse; */
+    border: 1px solid;
+    font-family: 'Gill Sans', 'Lucida Sans', sans-serif;
+    font-size: 12px;
+    width: 20%;
+}
+
+td {
+    border: 1px solid;  
 }

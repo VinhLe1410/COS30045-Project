@@ -169,7 +169,7 @@ function radialStackedBarplot(dataset, keysDomain) {
     yAxis.append("text")
             .attr("y", function(d) { return -yScale(yScale.ticks(5).pop()); })
             .attr("dy", "-1.5em")
-            .text("Population")
+            // .text("Population")
             .attr("font-size", "14px")
             .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
 
@@ -180,7 +180,7 @@ function radialStackedBarplot(dataset, keysDomain) {
                         .enter()
                         .append("g")
                         .attr("transform", function (d, i) {
-                            return "translate(-75," + (i - 2.5) * 20 + ")"; 
+                            return "translate(-60," + (i - 2.5) * 20 + ")"; 
                         });
 
     legend.append("rect")
@@ -190,7 +190,7 @@ function radialStackedBarplot(dataset, keysDomain) {
     
     legend.append("text")
             .attr("x", 24)
-            .attr("y", 9)
+            .attr("y", 15)
             .text(function (d) { 
                 if (d == "PAGGTU35" || d == "PAGGFU35" || d == "PAGGMU35") return "Under 35 years old";
                 if (d == "PAGGT344" || d == "PAGGF344" || d == "PAGGM344") return "35 - 44 years old";
@@ -198,6 +198,7 @@ function radialStackedBarplot(dataset, keysDomain) {
                 if (d == "PAGGT564" || d == "PAGGF564" || d == "PAGGM564") return "55 - 64 years old";
                 if (d == "PAGGT65O" || d == "PAGGF65O" || d == "PAGGM65O") return "65 - 74 years old";
             })
+            .attr("font-size", "12px")
             .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
 }
 

@@ -42,90 +42,54 @@
                     While reading the chart, web users could mouse-over on a bar to show its specific data of number of physicians on the hovered country and age group.
                 </p>
             </div>
-            <div>
-                <table>
-                    <caption>Country Code Notation:</caption>
-                    <tr>
-                        <th>Code</th>
-                        <td>AUS</td>
-                        <td>AUT</td>
-                        <td>BEL</td>
-                        <td>CAN</td>
-                        <td>CZE</td>
-                        <td>FRA</td>
-                        <td>DEU</td>
-                        <td>GRC</td>
-                        <td>HUN</td>
-                        <td>ISL</td>
-                        <td>IRL</td>
-                        <td>ITA</td>
-                        <td>KOR</td>
-                        <td>NLD</td>
-                        <td>NZL</td>
-                        <td>NOR</td>
-                        <td>POL</td>
-                        <td>SVK</td>
-                        <td>ESP</td>
-                        <td>CHE</td>
-                        <td>TUR</td>
-                        <td>GBR</td>
-                        <td>USA</td>
-                        <td>CHL</td>
-                        <td>EST</td>
-                        <td>ISR</td>
-                        <td>SVN</td>
-                        <td>LVA</td>
-                        <td>LTU</td>
-                        <td>COL</td>
-                        <td>BGR</td>
-                        <td>ROU</td>
-                        <td>HRV</td>
-                    </tr>
-                    <tr>
-                        <th>Country</th>
-                        <td>Australia</td>
-                        <td>Austria</td>
-                        <td>Belgium</td>
-                        <td>Canada</td>
-                        <td>Czechia</td>
-                        <td>France</td>
-                        <td>Germany</td>
-                        <td>Greece</td>
-                        <td>Hungary</td>
-                        <td>Iceland</td>
-                        <td>Ireland</td>
-                        <td>Italy</td>
-                        <td>Korea</td>
-                        <td>Netherland</td>
-                        <td>New Zealand</td>
-                        <td>Norway</td>
-                        <td>Poland</td>
-                        <td>Slovak Republic</td> 
-                        <td>Spain</td>
-                        <td>Switzerland</td>
-                        <td>Türkiye</td>
-                        <td>United Kingdom</td>
-                        <td>United States</td>
-                        <td>Chile</td>
-                        <td>Estonia</td>
-                        <td>Israel</td>
-                        <td>Slovenia</td>
-                        <td>Latvia</td>
-                        <td>Lithuania</td>
-                        <td>Colombia</td>
-                        <td>Bulgaria</td>
-                        <td>Romania</td>
-                        <td>Croatia</td>
-                    </tr>
-                </table>
-            </div>
         </div>
         <div>
             <h2>Visualisation</h2>
+                
             <button id="total">Total physicians</button>
             <button id="female">Female physicians</button>
             <button id="male">Male physicians</button>
-            <div id="visualisation">
+            <div id="container">
+                <table id="countryTable">
+                    <tr>
+                        <th>Code</th>
+                        <th>Country</th>
+                    </tr>
+                    <tr><td>AUS</td><td>Australia</td></tr>
+                    <tr><td>AUT</td><td>Austria</td></tr>
+                    <tr><td>BEL</td><td>Belgium</td></tr>
+                    <tr><td>CAN</td><td>Canada</td></tr>
+                    <tr><td>CZE</td><td>Czechia</td></tr>
+                    <tr><td>FRA</td><td>France</td></tr>
+                    <tr><td>DEU</td><td>Germany</td></tr>
+                    <tr><td>GRC</td><td>Greece</td></tr>
+                    <tr><td>HUN</td><td>Hungary</td></tr>
+                    <tr><td>ISL</td><td>Iceland</td></tr>
+                    <tr><td>IRL</td><td>Ireland</td></tr>
+                    <tr><td>ITA</td><td>Italy</td></tr>
+                    <tr><td>KOR</td><td>Korea</td></tr>
+                    <tr><td>NLD</td><td>Netherlands</td></tr>
+                    <tr><td>NZL</td><td>New Zealand</td></tr>
+                    <tr><td>NOR</td><td>Norway</td></tr>
+                    <tr><td>POL</td><td>Poland</td></tr>
+                    <tr><td>SVK</td><td>Slovak Republic</td></tr>
+                    <tr><td>ESP</td><td>Spain</td></tr>
+                    <tr><td>CHE</td><td>Switzerland</td></tr>
+                    <tr><td>TUR</td><td>Türkiye</td></tr>
+                    <tr><td>GBR</td><td>United Kingdom</td></tr>
+                    <tr><td>USA</td><td>United States</td></tr>
+                    <tr><td>CHL</td><td>Chile</td></tr>
+                    <tr><td>EST</td><td>Estonia</td></tr>
+                    <tr><td>ISR</td><td>Israel</td></tr>
+                    <tr><td>SVN</td><td>Slovenia</td></tr>
+                    <tr><td>LVA</td><td>Latvia</td></tr>
+                    <tr><td>LTU</td><td>Lithuania</td></tr>
+                    <tr><td>COL</td><td>Colombia</td></tr>
+                    <tr><td>BGR</td><td>Bulgaria</td></tr>
+                    <tr><td>ROU</td><td>Romania</td></tr>
+                    <tr><td>HRV</td><td>Croatia</td></tr>
+                </table>
+                <div id="visualisation"></div>
             </div>
         </div>
     </section>
