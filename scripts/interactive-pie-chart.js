@@ -128,8 +128,8 @@ function Pie_Chart(svg, svg_width, svg_height, year) {
                 .innerRadius(0);
 
     var color = d3.scaleOrdinal()
-                .domain(["Female", "Male"])
-                .range(["#005AB5","#DC3220"]);
+        .domain(["Female", "Male"])
+        .range(["#0072B2", "#E69F00"]);
 
     var arcs = svg.selectAll("g.arc")
                     .data(pie(dataset))
@@ -187,8 +187,8 @@ function Update_Pie(svg, svg_width, svg_height, year) {
                 .innerRadius(0);
 
     var color = d3.scaleOrdinal()
-                .domain(["Female", "Male"])
-                .range(["#005AB5","#DC3220"]);
+        .domain(["Female", "Male"])
+        .range(["#0072B2", "#E69F00"]);
 
     // Update existing arcs
     var arcs = svg.selectAll("g.arc")
@@ -245,95 +245,118 @@ function Bar_Chart(svg) {
     var yearMin = 2012;
     var color = d3.scaleOrdinal()
         .domain(["Female", "Male"])
-        .range(["#005AB5","#DC3220"]);
+        .range(["#0072B2", "#E69F00"]);
 
+    // Define the main x scale for age groups
     var xScale = d3.scaleBand()
-                    .domain(["Under 35", "35 - 44", "45 - 54", "55 - 64", "65 - 74"])
-                    .range([w_chart - margin_right, margin_left]);
+        .domain(["Under 35", "35 - 44", "45 - 54", "55 - 64", "65 - 74"])
+        .range([margin_left, w_chart - margin_right])
+        .padding([0.1]);
+
+    // Define a sub x scale for genders within each age group
+    var xSubgroup = d3.scaleBand()
+        .domain(["Male", "Female"])
+        .range([0, xScale.bandwidth()])
+        .padding([0.04]);
+
     var yScale = d3.scaleLinear()
-                    .domain([0, d3.max(dataByAge, d => d.Value)])
-                    .range([h_chart - margin_bottom, margin_top]);
+        .domain([0, d3.max(dataByAge, d => d.Value)])
+        .range([h_chart - margin_bottom, margin_top]);
 
+    // Add the X axis
     svg.append("g")
-      .attr("transform", `translate(0,${h_chart - margin_bottom})`)
-      .call(d3.axisBottom(xScale))
-      .call(g => g.append("text")
-          .attr("x", margin_right)
-          .attr("y", margin_bottom - 4)
-          .attr("fill", "currentColor")
-          .attr("text-anchor", "end")
-          .text("Age Groups"));
+        .attr("transform", `translate(0,${h_chart - margin_bottom})`)
+        .call(d3.axisBottom(xScale))
+        .call(g => g.append("text")
+            .attr("x", w_chart - margin_right)
+            .attr("y", margin_bottom - 4)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "end")
+            .text("Age Groups"));
 
+    // Add the Y axis
     svg.append("g")
         .attr("transform", `translate(${w_chart - margin_right},0)`)
-        .call(d3.axisRight(yScale).ticks(null, "s"))
+        .call(d3.axisRight(yScale)
+            .ticks(14))
         .call(g => g.select(".domain").remove())
         .call(g => g.append("text")
             .attr("x", margin_right - 15)
             .attr("y", 10)
-            .attr("fill", "currentColor")
+            .attr("fill", "black")
             .attr("text-anchor", "end")
             .text("Physicians"));
+
+    // Add the grid lines for specific ticks
+    // svg.append("g")
+    //     .attr("class", "grid")
+    //     .attr("transform", `translate(${margin_left},0)`)
+    //     .call(d3.axisLeft(yScale)
+    //         .ticks(14)
+    //         .tickSize(-w_chart + margin_right)
+    //         .tickFormat((d, i) => (i % 1 === 0 ? d3.format(".2s")(d) : "")))
+    //     .call(g => g.selectAll("line")
+    //         .attr("stroke-dasharray", "4,4")
+    //         .attr("stroke", "grey"));
 
     var group = svg.append("g");
     let bars = group.selectAll("rect");
 
     var legend = svg.append("g")
-                    .attr("class", "legend")
-                    .attr("transform", `translate(${margin_left + 20}, 20)`);
-    
+        .attr("class", "legend")
+        .attr("transform", `translate(${margin_left + 20}, 20)`);
+
     legend.selectAll("rect")
-          .data(color.domain())
-          .enter()
-          .append("rect")
-          .attr("x", 0)
-          .attr("y", (d, i) => i * 20)
-          .attr("width", 18)
-          .attr("height", 18)
-          .style("fill", color);
-    
+        .data(color.domain())
+        .enter()
+        .append("rect")
+        .attr("x", w_chart - margin_right - 110)
+        .attr("y", (d, i) => i * 20)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", color);
+
     legend.selectAll("text")
-          .data(color.domain())
-          .enter()
-          .append("text")
-          .attr("x", 24)
-          .attr("y", (d, i) => i * 20 + 10)
-          .attr("dy", ".35em")
-          .text(d => d);
+        .data(color.domain())
+        .enter()
+        .append("text")
+        .attr("x", w_chart - margin_right - 85)
+        .attr("y", (d, i) => i * 20 + 10)
+        .attr("dy", ".35em")
+        .text(d => d);
 
     return Object.assign(svg.node(), {
         update(Year) {
-            const dx = xScale.step() * (Year - yearMin) / yearStep;
-
             const chart_transition = svg.transition()
                 .ease(d3.easeLinear)
                 .duration(250);
-        
+
             bars = bars
                 .data(dataByAge.filter(d => d.Year === Year), d => `${d.Gender}:${d.Group}`)
                 .join(
-                enter => enter.append("rect")
-                    // .style("color", "black")
-                    .style("mix-blend-mode", "multiply")
-                    .attr("fill", d => color(d.Gender))
-                    .attr("x", d => xScale(d.Group) + 20)
-                    .attr("y", d => yScale(0))
-                    .attr("width", xScale.bandwidth() - 20)
-                    .attr("height", 0),
-                update => update,
-                exit => exit.call(bars => bars.transition(chart_transition).remove()
-                    .attr("y", yScale(0))
-                    .attr("height", 0))
+                    enter => enter.append("rect")
+                        .style("mix-blend-mode", "multiply")
+                        .attr("fill", d => color(d.Gender))
+                        .attr("x", d => xScale(d.Group) + xSubgroup(d.Gender))
+                        .attr("y", d => yScale(0))
+                        .attr("width", xSubgroup.bandwidth())
+                        .attr("height", 0),
+                    update => update,
+                    exit => exit.call(bars => bars.transition(chart_transition).remove()
+                        .attr("y", yScale(0))
+                        .attr("height", 0))
                 );
 
             bars.transition(chart_transition)
+                .attr("x", d => xScale(d.Group) + xSubgroup(d.Gender))
                 .attr("y", d => yScale(d.Value))
+                .attr("width", xSubgroup.bandwidth())
                 .attr("height", d => yScale(0) - yScale(d.Value));
-            
+
             group.transition(chart_transition)
-                .attr("transform", `translate(${-10},0)`);
+                .attr("transform", `translate(0,0)`);
         },
-        scales: {color}
+        scales: { color }
     });
 }
 
