@@ -1,5 +1,25 @@
+button {
+    background-color: #2a4d66; /* Green */
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 10px;
+    margin: 5px;
+    text-align: center;
+    display: inline-block;
+    transition-duration: 0.4s;
+    font-family: "Gill Sans", "Lucida Sans", sans-serif;
+}
+
+button:hover {
+    background-color: white;
+    color: #2a4d66;
+    border: 2px solid #2a4d66;
+}
+
 #container {
     display: flex;
+    margin: auto;
 }
 #visualisation {
     width: 100vw;

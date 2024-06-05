@@ -11,6 +11,7 @@
     <!-- <script src="https://unpkg.com/d3-simple-slider"></script> -->
 
     <!-- refer to style file -->
+    <link rel="stylesheet" href="./styles/style_all.css">
     <link rel="stylesheet" href="styles/style_pie_combo.css">
 
     <!-- refer to visualisation code files -->
@@ -22,32 +23,38 @@
             <nav>
                 <ul>
                     <li><a href="./home.html">Home</a></li>
-                    <li><a href="./radialStackedBarplot.html">Radial Stacked Barplot</a></li>
-                    <li><a href="./interactivePieChart.html">Pie and Bar Chart</a></li>
+                    <li><a href="./interactivePieChart.html">Changes of Australian Physicians by Gender</a></li>
+                    <li><a href="./radialStackedBarplot.html">Global Comparison of Physicians' Distribution</a></li>
                 </ul>
             </nav>
         </div>
     </header>
     <section>
-        <h1>Visualisation</h1>
-        <h2>Male and Female Physicians of Australia 2012 - 2021</h2>
-        <!-- Slider -->
-        <input type = "range" name = "year" id = "slider_year"
-                min = "2012" max = "2021" value = "2021" step = "1"
-                list = "markers">
-        <datalist id = "markers">
-            <option value = "2012" label = "2012"></option>
-            <option value = "2013" label = "2013"></option>
-            <option value = "2014" label = "2014"></option>
-            <option value = "2015" label = "2015"></option>
-            <option value = "2016" label = "2016"></option>
-            <option value = "2017" label = "2017"></option>
-            <option value = "2018" label = "2018"></option>
-            <option value = "2019" label = "2019"></option>
-            <option value = "2020" label = "2020"></option>
-            <option value = "2021" label = "2021"></option>
-        </datalist>
-        <div id = "visualisation"></div>
+        <h1>Male and Female Physicians of Australia 2012 - 2021</h1>
+        <div>
+            <h2>About the Visualisation</h2>
+        </div>
+        <div id="container">
+            <h2>Visualisation</h2>
+            <!-- Slider -->
+            <input type = "range" name = "year" id = "slider_year"
+                    min = "2012" max = "2021" value = "2021" step = "1"
+                    list = "markers">
+            <datalist id = "markers">
+                <option value = "2012" label = "2012"></option>
+                <option value = "2013" label = "2013"></option>
+                <option value = "2014" label = "2014"></option>
+                <option value = "2015" label = "2015"></option>
+                <option value = "2016" label = "2016"></option>
+                <option value = "2017" label = "2017"></option>
+                <option value = "2018" label = "2018"></option>
+                <option value = "2019" label = "2019"></option>
+                <option value = "2020" label = "2020"></option>
+                <option value = "2021" label = "2021"></option>
+            </datalist>
+            <div id = "visualisation"></div>
+        </div>
+        
     </section>
     <footer>
         <div>
@@ -56,15 +63,6 @@
                 <br>
                 A Dive into Gender Equality of Physicians in Australia and Other Countries.
             </p>
-        </div>
-        <div>
-            <nav>
-                <ul>
-                    <li><a href="./home.html">Home</a></li>
-                    <li><a href="./radialStackedBarplot.html">Radial Stacked Barplot</a></li>
-                    <li><a href="./interactivePieChart.html">Pie and Bar Chart</a></li>
-                </ul>
-            </nav>
         </div>
     </footer>
 </body>
