@@ -203,7 +203,7 @@ function radialStackedBarplot(dataset, keysDomain) {
 }
 
 
-d3.csv("../data/HEALTH_REAC_04052024140125591.csv", function(d) {
+d3.csv("./data/HEALTH_REAC_04052024140125591.csv", function(d) {
     return {
         VAR: d.VAR,             // Data code (total female, total male, etc.)
         COU: d.COU,             // Country code
