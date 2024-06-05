@@ -1,3 +1,4 @@
+// Function to determine age group based on the Variable Code
 function returnAgeGroup(variable) {
     var age_code = variable.slice(-3);
     if (age_code == "U35") return "Under 35";
@@ -7,6 +8,7 @@ function returnAgeGroup(variable) {
     if (age_code == "65O") return "65 - 74";
 }
 
+// Function to determine gender based on the Variable Code
 function returnGender(variable) {
     var gender_code = variable.slice(0, 5);
     if (gender_code == "PAGGT") return "Total";
@@ -20,6 +22,7 @@ const h_pie = 400;
 const outer_radius_max = w_pie/2;
 const outer_radius = outer_radius_max * 0.9;
 
+// Pie chart global variables
 var dataTotals;
 var structuredDataTotals = {};
 
@@ -31,6 +34,7 @@ const margin_right = 55;
 const margin_bottom = 35;
 const margin_left = 0;
 
+// Bar chart global variables
 var dataByAge;
 
 function init() {
@@ -44,31 +48,31 @@ function init() {
             Value: d.Value          // Estimated value
         };
     }).then(function(data) {
-        var filtered_totals = data.filter(function(d) {
-            return (d.Country == "Australia" &&                                 // From Australia;
-                    (d.Variable == "PAGGFEMM" || d.Variable == "PAGGHOMM") &&   // Total female and male;
-                    d.Unit == "PERSMYNB");                                      // Head counts;
+        var filtered_totals = data.filter(function(d) {                         // Filter a basic dataset for pie chart
+            return (d.Country == "Australia" &&                                 // From Australia
+                    (d.Variable == "PAGGFEMM" || d.Variable == "PAGGHOMM") &&   // Total female and male
+                    d.Unit == "PERSMYNB");                                      // Head counts
         });
 
-        var filtered_age_group = data.filter(function(d) {
-            return (d.Country == "Australia" && (
-                returnAgeGroup(d.Variable) == "Under 35" ||
+        var filtered_age_group = data.filter(function(d) {                      // Filter a basic dataset for bar chart (age group specific)
+            return (d.Country == "Australia" && (                               // From Australia
+                returnAgeGroup(d.Variable) == "Under 35" ||                     // Correct age groups
                 returnAgeGroup(d.Variable) == "35 - 44" ||
                 returnAgeGroup(d.Variable) == "45 - 54" ||
                 returnAgeGroup(d.Variable) == "55 - 64" ||
                 returnAgeGroup(d.Variable) == "65 - 74"
             ) && (
-                returnGender(d.Variable) == "Male" || returnGender(d.Variable) == "Female"
-            ) && ( d.Unit == "PERSMYNB"))
+                returnGender(d.Variable) == "Male" || returnGender(d.Variable) == "Female"  // Only Male/Female data, not both
+            ) && ( d.Unit == "PERSMYNB"))                                                   // Only head counts
         });
 
-        dataTotals = filtered_totals.map(d => ({
+        dataTotals = filtered_totals.map(d => ({        // Re-map the data to keep relevant attributes only
             Year: d.Year,
             Value: d.Value,
             Gender: returnGender(d.Variable)
         }));
 
-        dataByAge = filtered_age_group.map(d => ({
+        dataByAge = filtered_age_group.map(d => ({      // Same as above
             Group: returnAgeGroup(d.Variable),
             Gender: returnGender(d.Variable),
             Year: d.Year,
@@ -93,12 +97,12 @@ function init() {
         console.log(structuredDataTotals[2021]);         // Log for testing
 
         var svg = d3.select("#visualisation").append("svg")
-                    .attr("viewBox", "0 0 400 400")
-                    .attr("id", "svg_pie_chart");
+                    .attr("viewBox", "0 0 400 400")                 // Use viewBox for a scalable visualisation that resize with the window size
+                    .attr("id", "svg_pie_chart");                   // Set id for arranging purposes in CSS
         
         var svg2 = d3.select("#visualisation").append("svg")
-                    .attr("viewBox", "0 0 600 400")
-                    .attr("id", "svg_bar_chart");
+                    .attr("viewBox", "0 0 600 400")                 // Same as above
+                    .attr("id", "svg_bar_chart");                   // Same as above
 
         const slider_input = document.querySelector("#slider_year");
         var current_year = slider_input.value;
@@ -117,9 +121,10 @@ function init() {
     });
 }
 
+// Most of the code came from 7.2. D3 Pie Chart
 function Pie_Chart(svg, svg_width, svg_height, year) {
     var dataset = structuredDataTotals[year];
-    console.log(dataset);
+    console.log(dataset);                               // Log for testing
 
     var pie = d3.pie()
                 .value(function(d) { return d.value; });
@@ -127,7 +132,7 @@ function Pie_Chart(svg, svg_width, svg_height, year) {
                 .outerRadius(outer_radius)
                 .innerRadius(0);
 
-    var color = d3.scaleOrdinal()
+    var color = d3.scaleOrdinal()                       // Create a color scheme for visualization
         .domain(["Female", "Male"])
         .range(["#0072B2", "#E69F00"]);
 
@@ -140,7 +145,7 @@ function Pie_Chart(svg, svg_width, svg_height, year) {
 
     arcs.append("path")
         .attr("fill", function(d, i) {
-            return color(i);                            // Pick a color from the chosen scheme
+            return color(i);                            // Pick a color from the created scheme
         })
         .attr("d", function(d, i) {
             return arc(d, i);                           // Generate path string for each path
@@ -164,26 +169,26 @@ function Pie_Chart(svg, svg_width, svg_height, year) {
         d3.select(this)
             .select("path")
             .transition()
-            .duration(500)
+            .duration(250)
             .attr('d', expand);
 
-        tooltip.transition()
-            .duration(200)
+        tooltip.transition()                            // Transition to show the value using tooltip from HTML
+            .duration(250)
             .style("opacity", .9);
         tooltip.html("Value: " + d.data.value)
             .style("left", (event.pageX) + "px")
-            .style("top", (event.pageY - 28) + "px");
+            .style("top", (event.pageY) + "px");
     })
 
     arcs.on('mouseout', function(d) {
         d3.select(this)
             .select("path")
             .transition()
-            .duration(500)
+            .duration(250)
             .attr('d', arc);
 
         tooltip.transition()
-            .duration(500)
+            .duration(250)
             .style("opacity", 0);
     })
 }
@@ -199,7 +204,7 @@ function Update_Pie(svg, svg_width, svg_height, year) {
                 .outerRadius(outer_radius)
                 .innerRadius(0);
 
-    var color = d3.scaleOrdinal()
+    var color = d3.scaleOrdinal()       // Color scheme for the visualization
         .domain(["Female", "Male"])
         .range(["#0072B2", "#E69F00"]);
 
@@ -209,7 +214,7 @@ function Update_Pie(svg, svg_width, svg_height, year) {
 
     arcs.select("path")
         .transition()
-        .duration(500)
+        .duration(250)
         .attrTween("d", function(d) {
             var interpolate = d3.interpolate(this._current, d);
             this._current = interpolate(0);
@@ -220,7 +225,7 @@ function Update_Pie(svg, svg_width, svg_height, year) {
 
     arcs.select("text")
         .transition()
-        .duration(500)
+        .duration(250)
         .attr("transform", function(d) {
             return "translate("+(arc.centroid(d))+")";  // Update text position
         })
@@ -262,33 +267,31 @@ function Update_Pie(svg, svg_width, svg_height, year) {
         d3.select(this)
             .select("path")
             .transition()
-            .duration(500)
+            .duration(250)
             .attr('d', expand);
 
         tooltip.transition()
-            .duration(200)
+            .duration(250)
             .style("opacity", .9);
         tooltip.html("Value: " + d.data.value)
             .style("left", (event.pageX) + "px")
-            .style("top", (event.pageY - 28) + "px");
+            .style("top", (event.pageY) + "px");
     })
 
     arcs.on('mouseout', function(d) {
         d3.select(this)
             .select("path")
             .transition()
-            .duration(500)
+            .duration(250)
             .attr('d', arc);
 
         tooltip.transition()
-            .duration(500)
+            .duration(250)
             .style("opacity", 0);
     })
 }
 
 function Bar_Chart(svg) {
-    // var yearStep = 1;
-    // var yearMin = 2012;
     var color = d3.scaleOrdinal()
         .domain(["Female", "Male"])
         .range(["#0072B2", "#E69F00"]);
@@ -334,13 +337,14 @@ function Bar_Chart(svg) {
             .text("Physicians"));
 
     var group = svg.append("g");
-    let bars = group.selectAll("rect");
-    let labels = group.selectAll("text.bar-label"); // Create a variable for text elements
+    let bars = group.selectAll("rect");                 // Create a variable to handle all the bars in the chart
+    let labels = group.selectAll("text.bar-label");     // Create a variable for text elements
 
     var legend = svg.append("g")
         .attr("class", "legend")
         .attr("transform", `translate(${margin_left + 20}, 20)`);
 
+    // Color square for describing which color is for which gender
     legend.selectAll("rect")
         .data(color.domain())
         .enter()
@@ -351,6 +355,7 @@ function Bar_Chart(svg) {
         .attr("height", 16)
         .style("fill", color);
 
+    // Text description for each 
     legend.selectAll("text")
         .data(color.domain())
         .enter()
@@ -361,34 +366,39 @@ function Bar_Chart(svg) {
         .attr("dy", ".35em")
         .text(d => d);
 
+    // Credit goes to Mike Bostock, "Icelandic population by age, 1841 - 2019", 2023
+    // https://observablehq.com/@d3/icelandic-population-by-age-1841-2019?intent=fork
+    // return Object.assign() is useful for modularity purposes, and the ability to update charts easily.
     return Object.assign(svg.node(), {
         update(Year) {
             const chart_transition = svg.transition()
                 .ease(d3.easeLinear)
                 .duration(250);
 
+            // Bind filtered data to the bars, each is identified as Gender:Group
             bars = bars
                 .data(dataByAge.filter(d => d.Year === Year), d => `${d.Gender}:${d.Group}`)
                 .join(
                     enter => enter.append("rect")
-                        .style("mix-blend-mode", "multiply")
-                        .attr("fill", d => color(d.Gender))
-                        .attr("x", d => xScale(d.Group) + xSubgroup(d.Gender))
-                        .attr("y", d => yScale(0))
-                        .attr("width", xSubgroup.bandwidth())
-                        .attr("height", 0),
+                        .attr("fill", d => color(d.Gender))                     // Choose the correct color
+                        .attr("x", d => xScale(d.Group) + xSubgroup(d.Gender))  // X-position based on age group and gender
+                        .attr("y", d => yScale(0))                              // Y-position initialized at the bottom (0) 
+                        .attr("width", xSubgroup.bandwidth())                   // Width of the bars
+                        .attr("height", 0),                                     // Height initialized at 0 for animation later on
                     update => update,
                     exit => exit.call(bars => bars.transition(chart_transition).remove()
                         .attr("y", yScale(0))
                         .attr("height", 0))
                 );
 
-            bars.transition(chart_transition)
-                .attr("x", d => xScale(d.Group) + xSubgroup(d.Gender))
-                .attr("y", d => yScale(d.Value))
-                .attr("width", xSubgroup.bandwidth())
-                .attr("height", d => yScale(0) - yScale(d.Value));
+            bars.transition(chart_transition)                                   // Transition animation
+                .attr("x", d => xScale(d.Group) + xSubgroup(d.Gender))          // Set x-position
+                .attr("y", d => yScale(d.Value))                                // Set the y-position
+                .attr("width", xSubgroup.bandwidth())                           // Width
+                .attr("height", d => yScale(0) - yScale(d.Value));              // Height
 
+            // Labels are created for each bars, for the exact value (head counts)
+            // Same process as bars above
             labels = labels
                 .data(dataByAge.filter(d => d.Year === Year), d => `${d.Gender}:${d.Group}`)
                 .join(
