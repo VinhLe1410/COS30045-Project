@@ -10,6 +10,7 @@ body {
     width: auto;
 }
 
+/* Content of the pages */
 section {
     width: 80vw;
     justify-content: center;
@@ -34,7 +35,6 @@ br {
 
 
 /* Header, footer styles */
-
 header, footer {
     margin: 0;
     background-color: #2a4d66;

@@ -7,8 +7,6 @@
 
     <!-- refer to D3 library v7 -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- refer to D3-simpler-slider plug-in (NO LONGER IN USE) -->
-    <!-- <script src="https://unpkg.com/d3-simple-slider"></script> -->
 
     <!-- refer to style file -->
     <link rel="stylesheet" href="./styles/style_all.css">
@@ -37,21 +35,17 @@
                 <p>
                     This visualisation aims to compare number of physicians divided into age groups among OECD member and partner countries in 2021. 
                     Total, female, and male physicians are used for this comparison.
-                    <br>
-                    <br>
-                    The chart provided buttons to choose among radial stacked charts for number of Total (both female and male physicians), Female, and Male specific physicians.
-                    To view a chart, click on the preffered button option and the respective visualisation would be displayed. 
-                    While reading the chart, web users could mouse-over on a bar to show its specific data of number of physicians on the hovered country and age group.
                 </p>
             </div>
         </div>
         <div>
             <h2>Visualisation</h2>
-                
+            <!-- Buttons for options -->
             <button id="total">Total physicians</button>
             <button id="female">Female physicians</button>
             <button id="male">Male physicians</button>
             <div id="container">
+                <!-- Table for searching up country name based on country code -->
                 <table id="countryTable">
                     <tr>
                         <th>Code</th>
@@ -91,6 +85,7 @@
                     <tr><td>ROU</td><td>Romania</td></tr>
                     <tr><td>HRV</td><td>Croatia</td></tr>
                 </table>
+                <!-- Visualisation -->
                 <div id="visualisation"></div>
             </div>
         </div>

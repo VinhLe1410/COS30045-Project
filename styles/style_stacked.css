@@ -1,3 +1,5 @@
+/* Exclusively for Global Comparison of Physicians' Distribution - radial stacked barplot */
+/* Button for options */
 button {
     background-color: #2a4d66; /* Green */
     border: none;
@@ -17,35 +19,33 @@ button:hover {
     border: 2px solid #2a4d66;
 }
 
+/* Div contain the visualisation and the table */
 #container {
     display: flex;
     margin: auto;
 }
+
+/* The visualisation */
 #visualisation {
     width: 100vw;
     height: 100vh;
-    /* border: solid 1px red; */
     overflow: auto;
 }
 
 #svg_radial_bar_plot {
-    /* border: solid 3px green; */
     display: block;
-    /* display: block; */
     margin: auto;
-    /* width: 70%; */
     height: 100%;
 }
 
+/* Table which match country code with country name */
 table, th, td {
     border: 1px solid;
 }
 
 table {
-    /* margin-right: 20px; */
     border-collapse: collapse;
     font-family: 'Gill Sans', 'Lucida Sans', sans-serif;
     font-size: 12px;
     width: 25%;
-    /* height: 100%; */
 }

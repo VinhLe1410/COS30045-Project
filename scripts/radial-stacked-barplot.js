@@ -1,38 +1,45 @@
+//function changing data input from long to wide format
 function longToWide(dataset) {
+    //let country code be the key 
+    //let repetitive variables in VAR be the attributes of the new array, map with Value that respective to the country and the attribute
     var longToWideData = d3.rollup(
         dataset, 
         v => Object.fromEntries(v.map(d => [d.VAR, d.Value])),
         d => d.COU
     );
+
+    //reformat the wide dataset from [COU: <Country code>, {VAR1: Value1, VAR2: Value2, ...}]
     var result = Array.from(longToWideData, ([key, value]) => ({COU: key, ...value}));
     
-    console.log(result);
+    //test result
+    // console.log(result);
+
     return result;
 }
 
 function radialStackedBarplot(dataset, keysDomain) {
-//reset svg
+    //reset svg
     d3.select("svg").remove();
-//width and height of svg
+    
+    //width and height of svg
     var w = 900;
     var h = 900;
     var innerRadius = 125;
-    // var outerRadius = 350;
     var outerRadius = Math.min(w, h) / 2;
 
-//set up the stack
+    //set up the stack
     // list out manually all the keys for stacking to debug
     var stacks = d3.stack() //generate stacks
                     .keys(keysDomain); 
                     //specify the categories of interest
 
-//set up the svg canvas
+    //set up the svg canvas
     var svg = d3.select("#visualisation")
                 .append("svg")
                 .attr("id", "svg_radial_bar_plot")
                 .attr("viewBox", "0 0 900 900");
 
-//set up the scales
+    //set up the scales
     var xScale = d3.scaleBand()
                     .domain(dataset.map(function(d) {return d.COU;}))
                     .range([0, 2 * Math.PI])
@@ -47,12 +54,12 @@ function radialStackedBarplot(dataset, keysDomain) {
                     })])
                     .range([innerRadius, outerRadius]);
 
-//color scheme to attach to the arcs group
+    //color scheme to attach to the arcs group
     var color = d3.scaleOrdinal()
                     .domain(keysDomain)
                     .range(["#E69F00","#56B4E9","#009E73","#0072B2","#D55E00","#CC79A7"]) ; //d3 native color scheme (no. 10)
 
-//set up the arcs
+    //set up the arcs
     var groups = svg.append("g")
                     .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
 
@@ -64,7 +71,7 @@ function radialStackedBarplot(dataset, keysDomain) {
                 .padAngle(0.01)
                 .padRadius(innerRadius);
     
-    //from here (line 45 - 101): taken from d3 js library examples
+    //append each arc into group of arcs
     groups.append("g")
             .selectAll("g")
             .data(stacks(dataset))
@@ -79,16 +86,21 @@ function radialStackedBarplot(dataset, keysDomain) {
             .append("path")
             .attr("d", arc);
 
+    //if hover on a bar, do the function(event, d) which change fill color and display tooltip 
+    //showing the exact number of physicians respect to the preferred country and age group
     groups.selectAll("path")
             .on("mouseover", function(event, d) {
+                //change fill color
                 d3.select(this)
-                    .attr("original-fill", d3.select(this).attr('fill'))
-                    .attr("fill", "#F0E442")
+                    .attr("original-fill", d3.select(this).attr('fill')) //save original hue
+                    .attr("fill", "#F0E442") //show color when it is hovered
                     .transition()
                     .duration(1000);
 
-                var [xPosInRadial, yPosInRadial] = arc.centroid(d);
+                //get x and y polar position of the arcs to see where the mouse hovered on
+                var [xPosInRadial, yPosInRadial] = arc.centroid(d); 
 
+                //show exact number of physicians regarding preferred country and age group with background box
                 tooltip = svg.append("rect")
                                 .attr("id", "tooltipBox")
                                 .attr("x", xPosInRadial + outerRadius + 10)
@@ -106,18 +118,21 @@ function radialStackedBarplot(dataset, keysDomain) {
                                     .attr("font-size", "8px")
                                     .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
             })
+            //when the bar is not hovered anymore
             .on("mouseout", function() {
+                //change back to the original color
                 d3.select(this)
                     .attr("fill", d3.select(this).attr('original-fill'))
                     .transition()
                     .duration(1000);
 
+                //remove the tooltips
                 svg.select("#tooltipBox").remove();
                 svg.select("#tooltipText").remove();
 
             })
     
-// label indicating countries at xAxis
+    // group of labels indicating countries at xAxis
     var label = groups.append("g")
                     .selectAll("g")
                     .data(dataset)
@@ -128,11 +143,13 @@ function radialStackedBarplot(dataset, keysDomain) {
                         return "rotate(" + ((xScale(d.COU) + xScale.bandwidth() / 2) * 180 / Math.PI - 90) + ")translate(" + innerRadius + ",0)"; 
                     });
     
+    //line connect the bar to the Country code
     label.append("line")
             .attr("x2", -5)
             .attr("stroke", "#000")
             .attr("stroke-width", 1);
     
+    //display the country code text
     label.append("text")
             .attr("transform", function(d) {
                 return (xScale(d.COU) + xScale.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(90)translate(0,16)" : "rotate(-90)translate(0,-9)"; 
@@ -141,7 +158,8 @@ function radialStackedBarplot(dataset, keysDomain) {
             .attr("font-size", "8px")
             .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
 
-//y Axis settings and height of each bars
+    
+    //y Axis settings and height of each bars with ticks
     var yAxis = groups.append("g")
                         .attr("text-anchor", "middle");
                         
@@ -151,29 +169,21 @@ function radialStackedBarplot(dataset, keysDomain) {
                 .append("g");
 
     //cỉcle playing as line responsible for measuring - ticks
-    // debugging
     yTicks.append("circle")
             .attr("r", yScale)
-            // .attr("dy", "0.35em")
             .attr("stroke", "#808080")
             .attr("fill", "none")
             .attr("stroke-width", 0.5);
 
+    //text showing the value (number of people) at each tick
     yTicks.append("text")
             .attr("y", function(d) {return -yScale(d);})
             .attr("dy", "0.35em")
-            .text(yScale.tickFormat(5, "s"))
+            .text(yScale.tickFormat(5, "s")) //the value at each tick
             .attr("font-size", "12px")
-            .attr("font-family", "Gill Sans, Lucida Sans, sans-serif"); //the value at each tick
+            .attr("font-family", "Gill Sans, Lucida Sans, sans-serif"); 
 
-    yAxis.append("text")
-            .attr("y", function(d) { return -yScale(yScale.ticks(5).pop()); })
-            .attr("dy", "-1.5em")
-            // .text("Population")
-            .attr("font-size", "14px")
-            .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
-
-// legend
+    // legend group
     var legend = groups.append("g")
                         .selectAll("g")
                         .data(keysDomain)
@@ -183,11 +193,13 @@ function radialStackedBarplot(dataset, keysDomain) {
                             return "translate(-60," + (i - 2.5) * 20 + ")"; 
                         });
 
+    //boxes of colors of each age group
     legend.append("rect")
             .attr("width", 18)
             .attr("height", 18)
             .attr("fill", function (d, i) { return color(i);});
     
+    //labeling the category respect to the color it indicates to
     legend.append("text")
             .attr("x", 24)
             .attr("y", 15)
@@ -214,58 +226,80 @@ d3.csv("./data/HEALTH_REAC_04052024140125591.csv", function(d) {
         Value: +d.Value,         // Estimated value
     };
 }).then(function(data) {
+    //when click on total button
     d3.select("#total")
         .on("click", function() {
+            //filter raw data
             var filteredDataTotal = data.filter(function(d) {
                 return (d.UNIT == "PERSMYNB" && d.Year == 2021 && (d.VAR == "PAGGTOPY" || d.VAR == "PAGGTU35" || d.VAR == "PAGGT344" || d.VAR == "PAGGT454" || d.VAR == "PAGGT564" || d.VAR == "PAGGT65O"));
             });
             
+            //data reshape from long to wide
             var wideArrayTotal = longToWide(filteredDataTotal);
             
+            //filter data with missing attributes
             var processedDataTotal = wideArrayTotal.filter(function(d) {
                 return typeof d.PAGGTU35 != 'undefined' && typeof d.PAGGT344 != 'undefined' && typeof d.PAGGT454 != 'undefined' && typeof d.PAGGT564 != 'undefined' && typeof d.PAGGT65O != 'undefined';
             });
 
+            //supposed attributes of the data
             var stacksKeyTotal = ["PAGGTU35", "PAGGT344", "PAGGT454", "PAGGT564", "PAGGT65O"];
 
-            console.log(processedDataTotal);
+            //test data processed
+            // console.log(processedDataTotal);
+
             radialStackedBarplot(processedDataTotal, stacksKeyTotal);
         });
 
+    //when click on female button
     d3.select("#female")
         .on("click", function() {
+            //filter raw data
             var filteredDataFemale = data.filter(function(d) {
                 return (d.UNIT == "PERSMYNB" && d.Year == 2021 && (d.VAR == "PAGGFEMM" || d.VAR == "PAGGFU35" || d.VAR == "PAGGF344" || d.VAR == "PAGGF454" || d.VAR == "PAGGF564" || d.VAR == "PAGGF65O"));
             });
-            console.log(filteredDataFemale);
+            //test data filtered
+            // console.log(filteredDataFemale);
 
+            //data reshape from long to wide
             var wideArrayFemale = longToWide(filteredDataFemale);
 
+            //filter data with missing attributes
             var processedDataFemale = wideArrayFemale.filter(function(d) {
                 return typeof d.PAGGFU35 != 'undefined' && typeof d.PAGGF344 != 'undefined' && typeof d.PAGGF454 != 'undefined' && typeof d.PAGGF564 != 'undefined' && typeof d.PAGGF65O != 'undefined';
             });
 
+            //supposed attributes of the data
             var stacksKeyFemale = ["PAGGFU35", "PAGGF344", "PAGGF454", "PAGGF564", "PAGGF65O"];
 
-            console.log(processedDataFemale);
+            //test data processed
+            // console.log(processedDataFemale);
+
             radialStackedBarplot(processedDataFemale, stacksKeyFemale);
         });
 
+    //when click on male button
     d3.select("#male")
         .on("click", function() {
+            //filter raw data
             var filteredDataMale = data.filter(function(d) {
                 return (d.UNIT == "PERSMYNB" && d.Year == 2021 && (d.VAR == "PAGGHOMM" || d.VAR == "PAGGMU35" || d.VAR == "PAGGM344" || d.VAR == "PAGGM454" || d.VAR == "PAGGM564" || d.VAR == "PAGGM65O"));
             });
             
+            //data reshape from long to wide
             var wideArrayMale = longToWide(filteredDataMale);
 
+            //filter data with missing attributes
             var processedDataMale = wideArrayMale.filter(function(d) {
                 return typeof d.PAGGMU35 != 'undefined' && typeof d.PAGGM344 != 'undefined' && typeof d.PAGGM454 != 'undefined' && typeof d.PAGGM564 != 'undefined' && typeof d.PAGGM65O != 'undefined';
             });
             
+            //supposed attributes of the data
             var stacksKeyMale = ["PAGGMU35", "PAGGM344", "PAGGM454", "PAGGM564", "PAGGM65O"];
 
-            console.log(processedDataMale);
+            //test data processed
+            // console.log(processedDataMale);
+            
             radialStackedBarplot(processedDataMale, stacksKeyMale);
         });
 });
