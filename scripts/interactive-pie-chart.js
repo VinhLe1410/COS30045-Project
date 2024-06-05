@@ -154,7 +154,10 @@ function Pie_Chart(svg, svg_width, svg_height, year) {
             return "translate("+(arc.centroid(d))+")";  // Centroid is used to find the middle of a irregular shape
         });
 
-    arcs.on('mouseover', function(d) {
+    // Tooltip
+    var tooltip = d3.select("#tooltip");
+
+    arcs.on('mouseover', function(event, d) {
         let expand = d3.arc()
                         .innerRadius(0)
                         .outerRadius(outer_radius_max);
@@ -163,7 +166,13 @@ function Pie_Chart(svg, svg_width, svg_height, year) {
             .transition()
             .duration(500)
             .attr('d', expand);
-        
+
+        tooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
+        tooltip.html("Value: " + d.data.value)
+            .style("left", (event.pageX) + "px")
+            .style("top", (event.pageY - 28) + "px");
     })
 
     arcs.on('mouseout', function(d) {
@@ -172,6 +181,10 @@ function Pie_Chart(svg, svg_width, svg_height, year) {
             .transition()
             .duration(500)
             .attr('d', arc);
+
+        tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
     })
 }
 
@@ -238,11 +251,44 @@ function Update_Pie(svg, svg_width, svg_height, year) {
 
     // Remove old arcs
     arcs.exit().remove();
+
+    // Tooltip
+    var tooltip = d3.select("#tooltip");
+
+    arcs.on('mouseover', function(event, d) {
+        let expand = d3.arc()
+                        .innerRadius(0)
+                        .outerRadius(outer_radius_max);
+        d3.select(this)
+            .select("path")
+            .transition()
+            .duration(500)
+            .attr('d', expand);
+
+        tooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
+        tooltip.html("Value: " + d.data.value)
+            .style("left", (event.pageX) + "px")
+            .style("top", (event.pageY - 28) + "px");
+    })
+
+    arcs.on('mouseout', function(d) {
+        d3.select(this)
+            .select("path")
+            .transition()
+            .duration(500)
+            .attr('d', arc);
+
+        tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+    })
 }
 
 function Bar_Chart(svg) {
-    var yearStep = 1;
-    var yearMin = 2012;
+    // var yearStep = 1;
+    // var yearMin = 2012;
     var color = d3.scaleOrdinal()
         .domain(["Female", "Male"])
         .range(["#0072B2", "#E69F00"]);
@@ -287,20 +333,9 @@ function Bar_Chart(svg) {
             .attr("text-anchor", "end")
             .text("Physicians"));
 
-    // Add the grid lines for specific ticks
-    // svg.append("g")
-    //     .attr("class", "grid")
-    //     .attr("transform", `translate(${margin_left},0)`)
-    //     .call(d3.axisLeft(yScale)
-    //         .ticks(14)
-    //         .tickSize(-w_chart + margin_right)
-    //         .tickFormat((d, i) => (i % 1 === 0 ? d3.format(".2s")(d) : "")))
-    //     .call(g => g.selectAll("line")
-    //         .attr("stroke-dasharray", "4,4")
-    //         .attr("stroke", "grey"));
-
     var group = svg.append("g");
     let bars = group.selectAll("rect");
+    let labels = group.selectAll("text.bar-label"); // Create a variable for text elements
 
     var legend = svg.append("g")
         .attr("class", "legend")
@@ -312,16 +347,17 @@ function Bar_Chart(svg) {
         .append("rect")
         .attr("x", w_chart - margin_right - 110)
         .attr("y", (d, i) => i * 20)
-        .attr("width", 18)
-        .attr("height", 18)
+        .attr("width", 16)
+        .attr("height", 16)
         .style("fill", color);
 
     legend.selectAll("text")
         .data(color.domain())
         .enter()
         .append("text")
-        .attr("x", w_chart - margin_right - 85)
-        .attr("y", (d, i) => i * 20 + 10)
+        .attr("x", w_chart - margin_right - 90)
+        .attr("y", (d, i) => i * 20 + 9)
+        .attr("font-size", "13px")
         .attr("dy", ".35em")
         .text(d => d);
 
@@ -353,11 +389,31 @@ function Bar_Chart(svg) {
                 .attr("width", xSubgroup.bandwidth())
                 .attr("height", d => yScale(0) - yScale(d.Value));
 
+            labels = labels
+                .data(dataByAge.filter(d => d.Year === Year), d => `${d.Gender}:${d.Group}`)
+                .join(
+                    enter => enter.append("text")
+                        .attr("class", "bar-label")
+                        .attr("text-anchor", "middle")
+                        .attr("x", d => xScale(d.Group) + xSubgroup(d.Gender) + xSubgroup.bandwidth() / 2)
+                        .attr("y", d => yScale(d.Value) - 5)
+                        .text(d => d.Value)
+                        .attr("font-size", "12px"),
+                    update => update,
+                    exit => exit.call(labels => labels.transition(chart_transition).remove())
+                );
+
+            labels.transition(chart_transition)
+                .attr("x", d => xScale(d.Group) + xSubgroup(d.Gender) + xSubgroup.bandwidth() / 2)
+                .attr("y", d => yScale(d.Value) - 5)
+                .text(d => d.Value);
+
             group.transition(chart_transition)
                 .attr("transform", `translate(0,0)`);
         },
         scales: { color }
     });
 }
+
 
 window.onload = init;
