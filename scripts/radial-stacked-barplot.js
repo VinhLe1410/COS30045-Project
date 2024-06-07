@@ -105,17 +105,17 @@ function radialStackedBarplot(dataset, keysDomain) {
                                 .attr("id", "tooltipBox")
                                 .attr("x", xPosInRadial + outerRadius + 10)
                                 .attr("y", yPosInRadial + outerRadius + 10)
-                                .attr("width", "105px")
-                                .attr("height", "12px")
+                                .attr("width", "130px")
+                                .attr("height", "13px")
                                 .attr("fill", "white")
-                                .attr("opacity", 0.8);
+                                .attr("opacity", 0.9);
 
                 tooltipText = svg.append("text")
                                     .attr("id", "tooltipText")
                                     .attr("x", xPosInRadial + outerRadius + 15)
                                     .attr("y", yPosInRadial + outerRadius + 20)
-                                    .text("Number of Physicians: " + (d[1] - d[0]))
-                                    .attr("font-size", "8px")
+                                    .text("Physicians: " + (d[1] - d[0]))
+                                    .attr("font-size", "13px")
                                     .attr("font-family", "Gill Sans, Lucida Sans, sans-serif");
             })
             //when the bar is not hovered anymore
@@ -302,5 +302,6 @@ d3.csv("./data/HEALTH_REAC_04052024140125591.csv", function(d) {
             
             radialStackedBarplot(processedDataMale, stacksKeyMale);
         });
+    document.getElementById("total").click();
 });
 
